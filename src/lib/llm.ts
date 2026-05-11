@@ -164,8 +164,11 @@ export async function parseVocabFromImage(
     temperature: 0.1,
     max_tokens: 8192,
   };
+  // User's key is on Singapore region (modelstudio.console.alibabacloud.com,
+  // ap-southeast-1). Singapore keys 401 against the China endpoint
+  // (dashscope.aliyuncs.com) — must use the international endpoint.
   const res = await fetch(
-    'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+    'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions',
     {
       method: 'POST',
       headers: {
