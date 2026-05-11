@@ -146,9 +146,10 @@ export async function parseVocabFromImage(
   // the glm-4.6v-flash docs.
   const base64 = await fileToDownscaledBase64(file, 1920);
 
-  // Official glm-4.6v-flash docs (both Python and cURL examples) include
-  // `thinking: {type: "enabled"}` and DO NOT include max_tokens/temperature.
-  // Sending non-documented params triggered 1210 ("API 调用参数有误").
+  // glm-4.6v-flash requires `thinking:{type:'enabled'}` (verified — without it
+  // the API returned 1210). Output for 30-50 vocabulary entries is sizeable
+  // (~5000 tokens), and thinking-mode reasoning eats budget; we need a
+  // generous max_tokens or the JSON gets truncated mid-string.
   const body = {
     model: ZP_MODEL,
     messages: [
@@ -164,6 +165,7 @@ export async function parseVocabFromImage(
       },
     ],
     thinking: { type: 'enabled' },
+    max_tokens: 16384,
   };
   const res = await fetch(
     'https://open.bigmodel.cn/api/paas/v4/chat/completions',
@@ -195,8 +197,12 @@ function parseEntriesFromJsonString(content: string, provider: string): ParsedEn
   try {
     obj = JSON.parse(raw);
   } catch (err) {
+    // Show head + tail so truncation (very common with thinking models) is
+    // diagnosable from the error toast alone.
+    const head = raw.slice(0, 120);
+    const tail = raw.length > 240 ? raw.slice(-120) : '';
     throw new Error(
-      `${provider} 返回非 JSON: ${raw.slice(0, 200)}… (${String(err)})`,
+      `${provider} 返回非 JSON (${raw.length} 字符): ${head}…${tail ? `…${tail}` : ''} | ${String(err)}`,
     );
   }
   const arr = Array.isArray(obj)
