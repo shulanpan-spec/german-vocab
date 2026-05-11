@@ -29,30 +29,31 @@ export function hasKey(): boolean {
   return getKey().length > 0;
 }
 
-// ── Zhipu GLM-4V-Flash (image → JSON path, one-step, free tier) ────────
-const ZP_KEY = 'zhipu_api_key';
-// glm-4v-flash explicitly does NOT accept base64 ("GLM-4V-Flash限制1张图像且不支持
-// Base64编码" — official docs). The newer glm-4.6v-flash is also free AND accepts
-// base64 in image_url.url as a raw string (no data: prefix).
-const ZP_MODEL = 'glm-4.6v-flash';
+// ── Qwen-VL (image → JSON path, one-step, via Alibaba DashScope) ───────
+// OpenAI-compatible endpoint, base64 data URL works as-is. No thinking field
+// gymnastics. qwen-vl-max-latest is the strongest recall option for dense
+// textbook pages.
+const QWEN_KEY = 'qwen_api_key';
+const QWEN_MODEL = 'qwen-vl-max-latest';
 
-export function getZhipuKey(): string {
-  return localStorage.getItem(ZP_KEY) ?? '';
+export function getQwenKey(): string {
+  return localStorage.getItem(QWEN_KEY) ?? '';
 }
 
-export function setZhipuKey(key: string): void {
-  if (key) localStorage.setItem(ZP_KEY, key);
-  else localStorage.removeItem(ZP_KEY);
+export function setQwenKey(key: string): void {
+  if (key) localStorage.setItem(QWEN_KEY, key);
+  else localStorage.removeItem(QWEN_KEY);
 }
 
-export function hasZhipuKey(): boolean {
-  return getZhipuKey().length > 0;
+export function hasQwenKey(): boolean {
+  return getQwenKey().length > 0;
 }
 
-// One-time legacy cleanup: prior versions stored Gemini key / provider toggle.
+// One-time legacy cleanup: prior versions stored Gemini and Zhipu keys.
 export function cleanupLegacyKeys(): void {
   localStorage.removeItem('llm_provider');
   localStorage.removeItem('gemini_api_key');
+  localStorage.removeItem('zhipu_api_key');
 }
 
 const TEXT_PROMPT = `You produce structured German B2 vocabulary entries for the textbook "Im Berufssprachkurs B2 — Deutsch als Zweitsprache, Kurs- und Arbeitsbuch" (Hueber). The vocabulary register is workplace / professional German for DaZ learners: topics include jobs, workplace communication, advertising, training, scheduling, customer service, complaints, and similar Berufsalltag scenarios. Translate accordingly — prefer the practical/work-context Chinese rendering over abstract academic ones.
@@ -139,24 +140,20 @@ export async function parseVocabFromImage(
   file: File,
   lektion: number,
 ): Promise<ParsedEntry[]> {
-  const key = getZhipuKey();
-  if (!key) throw new Error('未配置 智谱 API key（去 Settings 填）');
+  const key = getQwenKey();
+  if (!key) throw new Error('未配置 Qwen API key（去 Settings 填）');
 
-  // Zhipu's image_url.url accepts a raw base64 string (no data: prefix) per
-  // the glm-4.6v-flash docs.
-  const base64 = await fileToDownscaledBase64(file, 1920);
+  // DashScope's OpenAI-compatible endpoint accepts a standard data URL.
+  const dataUrl = await fileToDownscaledDataUrl(file, 1920);
 
-  // glm-4.6v-flash requires `thinking:{type:'enabled'}` (verified — without it
-  // the API returned 1210). Output for 30-50 vocabulary entries is sizeable
-  // (~5000 tokens), and thinking-mode reasoning eats budget; we need a
-  // generous max_tokens or the JSON gets truncated mid-string.
+  // 30-50 entries × ~150 chars JSON each ≈ ~5000 tokens. Stay generous.
   const body = {
-    model: ZP_MODEL,
+    model: QWEN_MODEL,
     messages: [
       {
         role: 'user',
         content: [
-          { type: 'image_url', image_url: { url: base64 } },
+          { type: 'image_url', image_url: { url: dataUrl } },
           {
             type: 'text',
             text: `${VISION_PROMPT}\n\nLektion: ${lektion}`,
@@ -164,11 +161,11 @@ export async function parseVocabFromImage(
         ],
       },
     ],
-    thinking: { type: 'enabled' },
-    max_tokens: 16384,
+    temperature: 0.1,
+    max_tokens: 8192,
   };
   const res = await fetch(
-    'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+    'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
     {
       method: 'POST',
       headers: {
@@ -180,12 +177,12 @@ export async function parseVocabFromImage(
   );
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`Zhipu ${res.status}: ${errText.slice(0, 500)}`);
+    throw new Error(`Qwen ${res.status}: ${errText.slice(0, 500)}`);
   }
   const data = await res.json();
   const content = data?.choices?.[0]?.message?.content;
-  if (typeof content !== 'string') throw new Error('Zhipu 返回结构异常');
-  return parseEntriesFromJsonString(content, 'Zhipu');
+  if (typeof content !== 'string') throw new Error('Qwen 返回结构异常');
+  return parseEntriesFromJsonString(content, 'Qwen');
 }
 
 function parseEntriesFromJsonString(content: string, provider: string): ParsedEntry[] {
@@ -220,9 +217,9 @@ function parseEntriesFromJsonString(content: string, provider: string): ParsedEn
 
 // Phone photos can be 3-8 MB; downscale to 1920px on the long edge to keep the
 // base64 payload well under provider limits while preserving enough detail for
-// textbook lemma extraction. Returns RAW base64 (no data: prefix) because that
-// is what glm-4.6v-flash's image_url.url field accepts.
-async function fileToDownscaledBase64(file: File, maxDim: number): Promise<string> {
+// textbook lemma extraction. Returns a standard "data:image/jpeg;base64,..."
+// data URL that the OpenAI-compatible DashScope endpoint accepts directly.
+async function fileToDownscaledDataUrl(file: File, maxDim: number): Promise<string> {
   const url = URL.createObjectURL(file);
   try {
     const img = await new Promise<HTMLImageElement>((res, rej) => {
@@ -244,10 +241,7 @@ async function fileToDownscaledBase64(file: File, maxDim: number): Promise<strin
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, 0, 0, w, h);
-    const dataUrl = c.toDataURL('image/jpeg', 0.9);
-    // Strip "data:image/jpeg;base64," prefix → bare base64 string.
-    const comma = dataUrl.indexOf(',');
-    return comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+    return c.toDataURL('image/jpeg', 0.9);
   } finally {
     URL.revokeObjectURL(url);
   }

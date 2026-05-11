@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { getSettings, updateSettings } from '../store';
-import { getKey, setKey, getZhipuKey, setZhipuKey } from '../lib/llm';
+import { getKey, setKey, getQwenKey, setQwenKey } from '../lib/llm';
 
 export async function renderSettings(root: HTMLElement): Promise<void | (() => void)> {
   const s = getSettings();
@@ -30,17 +30,17 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
 
         <hr class="my-3">
 
-        <h3 class="text-sm font-semibold">智谱 GLM-4.6V-Flash（推荐 · 视觉直解 · 免费）</h3>
+        <h3 class="text-sm font-semibold">Qwen-VL-Max（推荐 · 视觉直解）</h3>
         <label class="text-sm">
-          <span class="text-gray-500">API key（仅存本机 localStorage，导出 JSON 不含）</span>
-          <input id="zkey" type="password" class="w-full mt-1 rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="xxxxxxxxxxxx.xxxxxxxx" value="${getZhipuKey()}">
+          <span class="text-gray-500">DashScope API key（仅存本机 localStorage，导出 JSON 不含）</span>
+          <input id="qkey" type="password" class="w-full mt-1 rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="sk-..." value="${getQwenKey()}">
         </label>
         <div class="flex gap-2 items-center">
-          <button id="zkey-save" class="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm font-medium">保存 key</button>
-          <button id="zkey-clear" class="rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-sm">清除</button>
-          <span id="zkey-status" class="text-sm text-gray-500"></span>
+          <button id="qkey-save" class="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm font-medium">保存 key</button>
+          <button id="qkey-clear" class="rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-sm">清除</button>
+          <span id="qkey-status" class="text-sm text-gray-500"></span>
         </div>
-        <p class="text-xs text-gray-400">拿 key: <a href="https://bigmodel.cn/console/apikeys" target="_blank" class="text-blue-600 underline">bigmodel.cn/console/apikeys</a> · 当前: ${getZhipuKey() ? '<span class="text-green-700">已配置</span>' : '<span class="text-gray-400">未配置</span>'}</p>
+        <p class="text-xs text-gray-400">拿 key: <a href="https://bailian.console.aliyun.com/?apiKey=1" target="_blank" class="text-blue-600 underline">bailian.console.aliyun.com</a> · 当前: ${getQwenKey() ? '<span class="text-green-700">已配置</span>' : '<span class="text-gray-400">未配置</span>'}</p>
 
         <hr class="my-3">
 
@@ -83,7 +83,7 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
   root.querySelectorAll('input').forEach((el) => {
     // Key inputs have their own explicit save buttons; don't trip the generic
     // settings persist on every keystroke.
-    if (el.id === 'zkey' || el.id === 'dkey') return;
+    if (el.id === 'qkey' || el.id === 'dkey') return;
     el.addEventListener('change', persist);
   });
 
@@ -116,7 +116,7 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
       flash('已清除');
     });
   };
-  wireKeyField('zkey', 'zkey-save', 'zkey-clear', 'zkey-status', setZhipuKey);
+  wireKeyField('qkey', 'qkey-save', 'qkey-clear', 'qkey-status', setQwenKey);
   wireKeyField('dkey', 'dkey-save', 'dkey-clear', 'dkey-status', setKey);
 
   root.querySelector('#export')!.addEventListener('click', async () => {

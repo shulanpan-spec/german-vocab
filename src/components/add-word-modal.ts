@@ -4,7 +4,7 @@ import {
   parseVocab,
   parseVocabFromImage,
   hasKey,
-  hasZhipuKey,
+  hasQwenKey,
   type ParsedEntry,
 } from '../lib/llm';
 import type { Article, POS, Word } from '../types';
@@ -33,7 +33,7 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
           📷 拍照 / 相册
           <input id="img" type="file" accept="image/*" class="hidden">
         </label>
-        <button id="vision" class="rounded-xl bg-blue-600 text-white py-2.5 px-3 text-sm font-medium">🖼️ GLM-4V 视觉直解（推荐）</button>
+        <button id="vision" class="rounded-xl bg-blue-600 text-white py-2.5 px-3 text-sm font-medium">🖼️ Qwen-VL 视觉直解（推荐）</button>
         <details class="text-xs text-gray-500">
           <summary class="cursor-pointer">备用：OCR + DeepSeek 文本路径</summary>
           <div class="flex flex-col gap-2 mt-2 pl-2 border-l-2 border-gray-200">
@@ -154,10 +154,10 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
     status.textContent = `已选照片（${(f.size / 1024).toFixed(0)} KB）。点 🖼️ 视觉直解 或展开备用 OCR 路径。`;
   });
 
-  // ── Vision direct (GLM-4V-Flash, one step) ──────────────────────────
+  // ── Vision direct (Qwen-VL-Max, one step) ───────────────────────────
   $('#vision').addEventListener('click', async () => {
-    if (!hasZhipuKey()) {
-      showErr('未配置 智谱 API key — 去 Settings 填');
+    if (!hasQwenKey()) {
+      showErr('未配置 Qwen API key — 去 Settings 填');
       return;
     }
     const f = imgInput.files?.[0];
@@ -168,11 +168,11 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
     const lektion = Number(($('#lektion') as HTMLInputElement).value) || defaultLektion;
     const status = $('#ocr-status');
     status.classList.remove('hidden');
-    status.textContent = '🖼️ GLM-4V 识别中…（视图 + 解析一步完成，10–30 秒）';
+    status.textContent = '🖼️ Qwen-VL 识别中…（视图 + 解析一步完成，10–30 秒）';
     try {
       const entries = await parseVocabFromImage(f, lektion);
       status.textContent = `识别出 ${entries.length} 个词条。`;
-      await renderCandidates(entries, 'zhipu-glm4v');
+      await renderCandidates(entries, 'qwen-vl');
     } catch (err) {
       status.textContent = '识别失败：' + String(err);
     }
