@@ -35,7 +35,12 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
           <span class="text-gray-500">API key（仅存本机 localStorage，导出 JSON 不含）</span>
           <input id="gkey" type="password" class="w-full mt-1 rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="AIzaSy..." value="${getGeminiKey()}">
         </label>
-        <p class="text-xs text-gray-400">免费 key: <a href="https://aistudio.google.com/apikey" target="_blank" class="text-blue-600 underline">aistudio.google.com/apikey</a></p>
+        <div class="flex gap-2 items-center">
+          <button id="gkey-save" class="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm font-medium">保存 key</button>
+          <button id="gkey-clear" class="rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-sm">清除</button>
+          <span id="gkey-status" class="text-sm text-gray-500"></span>
+        </div>
+        <p class="text-xs text-gray-400">免费 key: <a href="https://aistudio.google.com/apikey" target="_blank" class="text-blue-600 underline">aistudio.google.com/apikey</a> · 当前: ${getGeminiKey() ? '<span class="text-green-700">已配置</span>' : '<span class="text-gray-400">未配置</span>'}</p>
 
         <hr class="my-3">
 
@@ -67,10 +72,25 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
   });
 
   const gkeyInput = root.querySelector('#gkey') as HTMLInputElement;
-  gkeyInput.addEventListener('change', () => {
-    setGeminiKey(gkeyInput.value.trim());
-    msg.textContent = 'API key 已保存';
-    setTimeout(() => (msg.textContent = ''), 1500);
+  const gkeyStatus = root.querySelector('#gkey-status') as HTMLSpanElement;
+  const flashStatus = (msg: string, ok = true): void => {
+    gkeyStatus.textContent = msg;
+    gkeyStatus.className = `text-sm ${ok ? 'text-green-700' : 'text-red-600'}`;
+    setTimeout(() => (gkeyStatus.textContent = ''), 3000);
+  };
+  root.querySelector('#gkey-save')!.addEventListener('click', () => {
+    const v = gkeyInput.value.trim();
+    if (!v) {
+      flashStatus('未输入 key', false);
+      return;
+    }
+    setGeminiKey(v);
+    flashStatus('✓ 已保存（' + v.slice(0, 8) + '…）');
+  });
+  root.querySelector('#gkey-clear')!.addEventListener('click', () => {
+    setGeminiKey('');
+    gkeyInput.value = '';
+    flashStatus('已清除');
   });
 
   root.querySelector('#export')!.addEventListener('click', async () => {
