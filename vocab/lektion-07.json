@@ -1,5 +1,5 @@
 [
-  { "id": "L7-angabe", "german": "Angabe", "article": "die", "plural": "-n", "pos": "noun", "chinese": ["说明", "陈述"], "german_synonyms": [], "lektion": 7, "page": "S.54", "source": "Aspekte neu B2" },
+  { "id": "L7-angabe", "german": "Angabe", "article": "die", "plural": "-n", "pos": "noun", "chinese": ["说明", "陈述"], "german_synonyms": [], "lektion": 7, "page": "S.54", "source": "Im Berufssprachkurs B2" },
   { "id": "L7-ausdrucksvermoegen", "german": "Ausdrucksvermögen", "article": "das", "pos": "noun", "chinese": ["表达能力"], "german_synonyms": ["die Sprachfähigkeit"], "lektion": 7, "page": "S.54" },
   { "id": "L7-baecker", "german": "Bäcker", "article": "der", "plural": "-", "pos": "noun", "chinese": ["面包师"], "german_synonyms": ["der Konditor"], "lektion": 7, "page": "S.54" },
   { "id": "L7-meister", "german": "Meister", "article": "der", "plural": "-", "pos": "noun", "chinese": ["师傅", "大师"], "german_synonyms": ["der Fachmann"], "lektion": 7, "page": "S.54" },

@@ -32,9 +32,9 @@ export function cleanupLegacyKeys(): void {
   localStorage.removeItem('gemini_api_key');
 }
 
-const PROMPT = `You produce structured German B2 vocabulary entries in the style of the textbook "Aspekte neu B2".
+const PROMPT = `You produce structured German B2 vocabulary entries for the textbook "Im Berufssprachkurs B2 — Deutsch als Zweitsprache, Kurs- und Arbeitsbuch" (Hueber). The vocabulary register is workplace / professional German for DaZ learners: topics include jobs, workplace communication, advertising, training, scheduling, customer service, complaints, and similar Berufsalltag scenarios. Translate accordingly — prefer the practical/work-context Chinese rendering over abstract academic ones.
 
-Input: raw OCR text from a textbook vocabulary list page. The page may include noise such as page numbers (e.g. "S.54"), section headers ("Lektion 7", "Nomen", "Verben", "Adjektive"), Chinese handwritten translations alongside German words, asterisks (*) marking irregular verbs, plural markers ("-en", "-e", "Anlässe", "Jubiläen"), articles ("der", "die", "das"), and decorative typography.
+Input: raw OCR text from a textbook vocabulary list page. The page may include noise such as page numbers (e.g. "S.54", "S.63"), section headers ("Lektion 7", "Nomen", "Verben", "Adjektive"), Chinese handwritten translations alongside German words, asterisks (*) marking irregular verbs, plural markers ("-en", "-e", "Anlässe", "Jubiläen"), articles ("der", "die", "das"), and decorative typography.
 
 Output: a JSON object {"entries": [...]} where entries is an array of vocabulary entries. For each German lemma found in the input:
 
@@ -42,14 +42,14 @@ Output: a JSON object {"entries": [...]} where entries is an array of vocabulary
 - "article": "der" / "die" / "das" — ONLY for nouns. Determine from context or your own knowledge of German.
 - "plural": e.g. "-n", "-en", "-e", "-", "Anlässe", "Jubiläen", "Gehälter". ONLY for nouns when known or shown in source. Use the textbook conventional suffix style ("-n", "-en", etc.) when the plural is regular; use the full plural form when umlaut-changing.
 - "pos": one of "noun" / "verb" / "adj" / "adv" / "phrase".
-- "chinese": array of 1–3 concise Chinese translations matching textbook register (e.g. ["说明","陈述"], ["举办","组织"], ["谨慎的","仔细的"]). Use simplified Chinese. Avoid sentence-form translations.
+- "chinese": array of 1–3 concise Chinese translations matching the Berufssprachkurs workplace register (e.g. ["说明","陈述"], ["举办","组织"], ["谨慎的","仔细的"], ["排班","轮班"]). Use simplified Chinese. Avoid sentence-form translations.
 - "german_synonyms": array of 0–3 B2-level German synonyms when natural. Include article for noun synonyms (e.g. ["die Sprachfähigkeit"]).
 - "irregular": true ONLY for verbs that are irregular (marked * in source, or known: schaffen, beweisen, vermeiden, vorschreiben, bestehen, enthalten, entsprechen, aufschreiben, etc.).
 
 Rules:
 - BE EXHAUSTIVE. Extract EVERY potential German vocabulary entry visible in the OCR. Do NOT skip entries because the OCR text is messy, incomplete, or hard to read — use German morphology + textbook context to reconstruct the lemma.
 - The OCR may have been run on a 2-column textbook page; reading order may be scrambled, with one column appearing after another (sometimes marked by "=== 右栏 ==="). Treat the whole text as a flat pool of candidate words.
-- For B2 vocabulary (Aspekte neu B2 register), you reliably know the standard Chinese translation. Provide it. Only omit an entry if you cannot identify what the German lemma is at all.
+- For B2 vocabulary (Im Berufssprachkurs B2 register), you reliably know the standard Chinese translation. Provide it. Only omit an entry if you cannot identify what the German lemma is at all.
 - Skip page numbers ("S.54", "S.63"), section labels ("Lektion 7", "Nomen", "Verben", "Adjektive", "weitere Wörter", section letters like "A", "B", "C", "D"), and decorative separators.
 - Skip Chinese-only lines and non-vocabulary annotations.
 - If a German entry has multiple senses with different POS or articles, emit separate entries.
