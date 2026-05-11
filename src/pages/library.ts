@@ -1,14 +1,16 @@
 import { db } from '../db';
 import { navigate } from '../router';
+import { openAddWordModal } from '../components/add-word-modal';
 import type { Word, ReviewState } from '../types';
 
 export async function renderLibrary(root: HTMLElement): Promise<void | (() => void)> {
   const words = await db.words.toArray();
   const states = await db.review_state.toArray();
   const stateMap = new Map(states.map((s) => [s.word_id, s]));
+  const maxLektion = words.reduce((m, w) => Math.max(m, w.lektion), 7);
 
   root.innerHTML = `
-    <div class="min-h-full flex flex-col">
+    <div class="min-h-full flex flex-col relative">
       <header class="px-5 pt-6 pb-3 flex items-center gap-3">
         <a href="#/home" class="text-gray-500">←</a>
         <h1 class="text-2xl font-serif">词库</h1>
@@ -23,7 +25,8 @@ export async function renderLibrary(root: HTMLElement): Promise<void | (() => vo
           <option value="leech">困难 (≥3 失败)</option>
         </select>
       </div>
-      <ul id="list" class="px-3 flex-1 overflow-auto"></ul>
+      <ul id="list" class="px-3 flex-1 overflow-auto pb-24"></ul>
+      <button id="fab" class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gray-900 text-white text-3xl shadow-lg flex items-center justify-center" aria-label="添加单词">+</button>
     </div>
   `;
   const listEl = root.querySelector('#list') as HTMLUListElement;
@@ -63,7 +66,19 @@ export async function renderLibrary(root: HTMLElement): Promise<void | (() => vo
   filterSel.addEventListener('change', render);
   render();
 
-  return () => listEl.removeEventListener('click', onClick);
+  const fab = root.querySelector('#fab') as HTMLButtonElement;
+  const onFab = (): void => {
+    openAddWordModal({
+      defaultLektion: maxLektion,
+      onSaved: () => navigate('#/library'),
+    });
+  };
+  fab.addEventListener('click', onFab);
+
+  return () => {
+    listEl.removeEventListener('click', onClick);
+    fab.removeEventListener('click', onFab);
+  };
 }
 
 function renderRow(w: Word, s?: ReviewState): string {

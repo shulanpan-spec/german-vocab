@@ -27,6 +27,7 @@
     "workbox-window": "^7.4.1"
   },
   "dependencies": {
-    "dexie": "^4.4.2"
+    "dexie": "^4.4.2",
+    "tesseract.js": "^7.0.0"
   }
 }
