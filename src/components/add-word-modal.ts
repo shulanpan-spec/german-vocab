@@ -30,6 +30,10 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
           </label>
           <button id="parse" class="flex-1 rounded-xl bg-blue-100 text-blue-800 py-2 px-3 text-sm">🤖 ${activeProviderLabel()} 解析</button>
         </div>
+        <label class="text-xs text-gray-600 flex items-center gap-2 -mt-1">
+          <input id="twocol" type="checkbox" checked>
+          双栏切分（Aspekte 这种 2 列课本必勾）
+        </label>
         <div id="ocr-status" class="text-xs text-gray-500 hidden"></div>
         <textarea id="ocr" class="rounded-xl bg-gray-50 border p-2 text-sm font-mono" rows="4" placeholder="OCR 原始文本，或直接粘贴德语词列表"></textarea>
 
@@ -133,12 +137,17 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
     const status = $('#ocr-status');
     status.classList.remove('hidden');
     status.textContent = '准备 OCR…';
+    const twocol = ($('#twocol') as HTMLInputElement).checked;
     try {
-      const text = await recognize(f, (label, pct) => {
-        status.textContent = `${label} ${pct}%`;
-      });
+      const text = await recognize(
+        f,
+        (label, pct) => {
+          status.textContent = `${label} ${pct}%`;
+        },
+        { columns: twocol ? 2 : 1 },
+      );
       ($('#ocr') as HTMLTextAreaElement).value = text.trim();
-      status.textContent = `OCR 完成（${text.trim().length} 字符）。点 🤖 Gemini 解析。`;
+      status.textContent = `OCR 完成（${text.trim().length} 字符）。点 🤖 ${activeProviderLabel()} 解析。`;
     } catch (err) {
       status.textContent = '识别失败：' + String(err);
     }

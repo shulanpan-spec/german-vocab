@@ -59,10 +59,14 @@ Output: a JSON array of entries. For each German lemma found in the input:
 - "irregular": true ONLY for verbs that are irregular (marked * in source, or known: schaffen, beweisen, vermeiden, vorschreiben, bestehen, enthalten, entsprechen, aufschreiben, etc.).
 
 Rules:
-- Skip page numbers, section labels, blank lines.
-- Skip Chinese-only lines and any non-vocabulary annotations.
+- BE EXHAUSTIVE. Extract EVERY potential German vocabulary entry visible in the OCR. Do NOT skip entries because the OCR text is messy, incomplete, or hard to read — use German morphology + textbook context to reconstruct the lemma.
+- The OCR may have been run on a 2-column textbook page; reading order may be scrambled, with one column appearing after another (sometimes marked by "=== 右栏 ==="). Treat the whole text as a flat pool of candidate words.
+- For B2 vocabulary (Aspekte neu B2 register), you reliably know the standard Chinese translation. Provide it. Only omit an entry if you cannot identify what the German lemma is at all.
+- Skip page numbers ("S.54", "S.63"), section labels ("Lektion 7", "Nomen", "Verben", "Adjektive", "weitere Wörter", section letters like "A", "B", "C", "D"), and decorative separators.
+- Skip Chinese-only lines and non-vocabulary annotations.
 - If a German entry has multiple senses with different POS or articles, emit separate entries.
-- Do NOT invent translations — if you cannot match a reliable Chinese meaning, omit the entry.
+- The textbook may show a verb with its preposition/case, e.g. "sich auswirken auf (+ Akk.)", "klären mit (+ Dat.)". Use this as the lemma (include the preposition + case marker in "german").
+- Plural notation: "-en" stays "-en"; "Anlässe" (umlaut form) becomes "Anlässe"; "Zentren" stays "Zentren". For singular-only words, omit "plural".
 - Output JSON only, no commentary.`;
 
 const SCHEMA = {
