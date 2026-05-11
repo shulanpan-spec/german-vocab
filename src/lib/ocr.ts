@@ -10,13 +10,16 @@ export async function getOcrWorker(onProgress?: ProgressFn) {
     onProgress?.('加载 OCR 引擎', 0);
     const Tesseract = await import('tesseract.js');
     workerPromise = (async () => {
-      const w = await Tesseract.createWorker(['deu', 'chi_sim'], 1, {
+      // German-only: Chinese handwritten notes in the textbook would corrupt
+      // the German lines if chi_sim were enabled. The downstream LLM provides
+      // Chinese translations from the German lemma anyway.
+      const w = await Tesseract.createWorker(['deu'], 1, {
         logger: (m: { status: string; progress: number }) => {
           if (!onProgress) return;
           const label = m.status === 'recognizing text'
             ? '识别中'
             : m.status === 'loading language traineddata'
-            ? '下载语言模型 (首次约 25MB)'
+            ? '下载德语模型 (首次约 10MB)'
             : m.status;
           onProgress(label, Math.round(m.progress * 100));
         },
