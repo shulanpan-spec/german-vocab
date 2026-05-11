@@ -146,6 +146,9 @@ export async function parseVocabFromImage(
   // the glm-4.6v-flash docs.
   const base64 = await fileToDownscaledBase64(file, 1920);
 
+  // Official glm-4.6v-flash docs (both Python and cURL examples) include
+  // `thinking: {type: "enabled"}` and DO NOT include max_tokens/temperature.
+  // Sending non-documented params triggered 1210 ("API 调用参数有误").
   const body = {
     model: ZP_MODEL,
     messages: [
@@ -160,8 +163,7 @@ export async function parseVocabFromImage(
         ],
       },
     ],
-    temperature: 0.1,
-    max_tokens: 8000,
+    thinking: { type: 'enabled' },
   };
   const res = await fetch(
     'https://open.bigmodel.cn/api/paas/v4/chat/completions',
