@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { getSettings, updateSettings } from '../store';
-import { getKey, setKey } from '../lib/llm';
+import { getKey, setKey, getZhipuKey, setZhipuKey } from '../lib/llm';
 
 export async function renderSettings(root: HTMLElement): Promise<void | (() => void)> {
   const s = getSettings();
@@ -30,7 +30,21 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
 
         <hr class="my-3">
 
-        <h3 class="text-sm font-semibold">DeepSeek API（用于"添加单词"的 🤖 自动解析）</h3>
+        <h3 class="text-sm font-semibold">智谱 GLM-4V-Flash（推荐 · 视觉直解 · 免费）</h3>
+        <label class="text-sm">
+          <span class="text-gray-500">API key（仅存本机 localStorage，导出 JSON 不含）</span>
+          <input id="zkey" type="password" class="w-full mt-1 rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="xxxxxxxxxxxx.xxxxxxxx" value="${getZhipuKey()}">
+        </label>
+        <div class="flex gap-2 items-center">
+          <button id="zkey-save" class="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm font-medium">保存 key</button>
+          <button id="zkey-clear" class="rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-sm">清除</button>
+          <span id="zkey-status" class="text-sm text-gray-500"></span>
+        </div>
+        <p class="text-xs text-gray-400">拿 key: <a href="https://bigmodel.cn/console/apikeys" target="_blank" class="text-blue-600 underline">bigmodel.cn/console/apikeys</a> · 当前: ${getZhipuKey() ? '<span class="text-green-700">已配置</span>' : '<span class="text-gray-400">未配置</span>'}</p>
+
+        <hr class="my-3">
+
+        <h3 class="text-sm font-semibold">DeepSeek API（备用 · OCR→文本解析路径）</h3>
         <label class="text-sm">
           <span class="text-gray-500">API key（仅存本机 localStorage，导出 JSON 不含）</span>
           <input id="dkey" type="password" class="w-full mt-1 rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="sk-..." value="${getKey()}">
@@ -67,31 +81,43 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
     setTimeout(() => (msg.textContent = ''), 1500);
   };
   root.querySelectorAll('input').forEach((el) => {
-    if (el.id === 'gkey') return;
+    // Key inputs have their own explicit save buttons; don't trip the generic
+    // settings persist on every keystroke.
+    if (el.id === 'zkey' || el.id === 'dkey') return;
     el.addEventListener('change', persist);
   });
 
-  const keyInput = root.querySelector('#dkey') as HTMLInputElement;
-  const keyStatus = root.querySelector('#dkey-status') as HTMLSpanElement;
-  const flashStatus = (msg: string, ok = true): void => {
-    keyStatus.textContent = msg;
-    keyStatus.className = `text-sm ${ok ? 'text-green-700' : 'text-red-600'}`;
-    setTimeout(() => (keyStatus.textContent = ''), 3000);
+  const wireKeyField = (
+    inputId: string,
+    saveId: string,
+    clearId: string,
+    statusId: string,
+    set: (v: string) => void,
+  ): void => {
+    const input = root.querySelector(`#${inputId}`) as HTMLInputElement;
+    const status = root.querySelector(`#${statusId}`) as HTMLSpanElement;
+    const flash = (msg: string, ok = true): void => {
+      status.textContent = msg;
+      status.className = `text-sm ${ok ? 'text-green-700' : 'text-red-600'}`;
+      setTimeout(() => (status.textContent = ''), 3000);
+    };
+    root.querySelector(`#${saveId}`)!.addEventListener('click', () => {
+      const v = input.value.trim();
+      if (!v) {
+        flash('未输入 key', false);
+        return;
+      }
+      set(v);
+      flash(`✓ 已保存（${v.slice(0, 8)}…）`);
+    });
+    root.querySelector(`#${clearId}`)!.addEventListener('click', () => {
+      set('');
+      input.value = '';
+      flash('已清除');
+    });
   };
-  root.querySelector('#dkey-save')!.addEventListener('click', () => {
-    const v = keyInput.value.trim();
-    if (!v) {
-      flashStatus('未输入 key', false);
-      return;
-    }
-    setKey(v);
-    flashStatus(`✓ 已保存（${v.slice(0, 8)}…）`);
-  });
-  root.querySelector('#dkey-clear')!.addEventListener('click', () => {
-    setKey('');
-    keyInput.value = '';
-    flashStatus('已清除');
-  });
+  wireKeyField('zkey', 'zkey-save', 'zkey-clear', 'zkey-status', setZhipuKey);
+  wireKeyField('dkey', 'dkey-save', 'dkey-clear', 'dkey-status', setKey);
 
   root.querySelector('#export')!.addEventListener('click', async () => {
     const dump = {

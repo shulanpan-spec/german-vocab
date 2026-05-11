@@ -1,6 +1,12 @@
 import { db } from '../db';
 import { recognize } from '../lib/ocr';
-import { parseVocab, hasKey, type ParsedEntry } from '../lib/llm';
+import {
+  parseVocab,
+  parseVocabFromImage,
+  hasKey,
+  hasZhipuKey,
+  type ParsedEntry,
+} from '../lib/llm';
 import type { Article, POS, Word } from '../types';
 
 export interface AddWordModalOpts {
@@ -23,21 +29,25 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
       </header>
 
       <div class="px-5 py-4 flex flex-col gap-3">
-        <div class="flex gap-2">
-          <label class="flex-1 rounded-xl bg-gray-100 py-2 px-3 text-sm flex items-center justify-center cursor-pointer">
-            📷 拍照 / 相册
-            <input id="img" type="file" accept="image/*" class="hidden">
-          </label>
-          <button id="parse" class="flex-1 rounded-xl bg-blue-100 text-blue-800 py-2 px-3 text-sm">🤖 DeepSeek 解析</button>
-        </div>
-        <label class="text-xs text-gray-600 flex items-center gap-2 -mt-1">
-          <input id="twocol" type="checkbox" checked>
-          双栏切分（2 列课本页必勾）
+        <label class="rounded-xl bg-gray-100 py-2 px-3 text-sm flex items-center justify-center cursor-pointer">
+          📷 拍照 / 相册
+          <input id="img" type="file" accept="image/*" class="hidden">
         </label>
-        <label class="text-xs text-gray-600 flex items-center gap-2 -mt-2">
-          <input id="croprhs" type="checkbox" checked>
-          截除右侧手写笔记（Lernwortschatz 页带答题划线时勾上）
-        </label>
+        <button id="vision" class="rounded-xl bg-blue-600 text-white py-2.5 px-3 text-sm font-medium">🖼️ GLM-4V 视觉直解（推荐）</button>
+        <details class="text-xs text-gray-500">
+          <summary class="cursor-pointer">备用：OCR + DeepSeek 文本路径</summary>
+          <div class="flex flex-col gap-2 mt-2 pl-2 border-l-2 border-gray-200">
+            <button id="parse" class="rounded-xl bg-blue-100 text-blue-800 py-2 px-3 text-sm">🤖 OCR → DeepSeek 解析</button>
+            <label class="text-xs text-gray-600 flex items-center gap-2">
+              <input id="twocol" type="checkbox" checked>
+              双栏切分（2 列课本页必勾）
+            </label>
+            <label class="text-xs text-gray-600 flex items-center gap-2">
+              <input id="croprhs" type="checkbox" checked>
+              截除右侧手写笔记（Lernwortschatz 页带答题划线时勾上）
+            </label>
+          </div>
+        </details>
         <div id="ocr-status" class="text-xs text-gray-500 hidden"></div>
         <textarea id="ocr" class="rounded-xl bg-gray-50 border p-2 text-sm font-mono" rows="4" placeholder="OCR 原始文本，或直接粘贴德语词列表"></textarea>
 
@@ -133,56 +143,87 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
     if (e.target === root) close();
   });
 
-  // ── OCR ─────────────────────────────────────────────────────
+  // ── File picker (passive — picking a photo no longer runs Tesseract
+  // automatically; user picks a path via the action buttons below) ──────
   const imgInput = $<HTMLInputElement>('#img');
-  imgInput.addEventListener('change', async () => {
+  imgInput.addEventListener('change', () => {
     const f = imgInput.files?.[0];
     if (!f) return;
     const status = $('#ocr-status');
     status.classList.remove('hidden');
-    status.textContent = '准备 OCR…';
-    const twocol = ($('#twocol') as HTMLInputElement).checked;
-    const cropRhs = ($('#croprhs') as HTMLInputElement).checked;
-    try {
-      const text = await recognize(
-        f,
-        (label, pct) => {
-          status.textContent = `${label} ${pct}%`;
-        },
-        { columns: twocol ? 2 : 1, cropAnnotations: cropRhs },
-      );
-      ($('#ocr') as HTMLTextAreaElement).value = text.trim();
-      status.textContent = `OCR 完成（${text.trim().length} 字符）。点 🤖 DeepSeek 解析。`;
-    } catch (err) {
-      status.textContent = '识别失败：' + String(err);
-    }
+    status.textContent = `已选照片（${(f.size / 1024).toFixed(0)} KB）。点 🖼️ 视觉直解 或展开备用 OCR 路径。`;
   });
 
-  // ── Gemini parse ─────────────────────────────────────────────
-  $('#parse').addEventListener('click', async () => {
-    if (!hasKey()) {
-      showErr('未配置 DeepSeek API key — 去 Settings 填');
+  // ── Vision direct (GLM-4V-Flash, one step) ──────────────────────────
+  $('#vision').addEventListener('click', async () => {
+    if (!hasZhipuKey()) {
+      showErr('未配置 智谱 API key — 去 Settings 填');
       return;
     }
-    const ocrText = ($('#ocr') as HTMLTextAreaElement).value.trim();
-    if (!ocrText) {
-      showErr('OCR 文本为空');
+    const f = imgInput.files?.[0];
+    if (!f) {
+      showErr('先选一张照片');
       return;
     }
     const lektion = Number(($('#lektion') as HTMLInputElement).value) || defaultLektion;
     const status = $('#ocr-status');
     status.classList.remove('hidden');
-    status.textContent = `🤖 DeepSeek 解析中…`;
+    status.textContent = '🖼️ GLM-4V 识别中…（视图 + 解析一步完成，10–30 秒）';
+    try {
+      const entries = await parseVocabFromImage(f, lektion);
+      status.textContent = `识别出 ${entries.length} 个词条。`;
+      await renderCandidates(entries, 'zhipu-glm4v');
+    } catch (err) {
+      status.textContent = '识别失败：' + String(err);
+    }
+  });
+
+  // ── Backup: OCR + DeepSeek text parse ────────────────────────────────
+  $('#parse').addEventListener('click', async () => {
+    if (!hasKey()) {
+      showErr('未配置 DeepSeek API key — 去 Settings 填');
+      return;
+    }
+    const status = $('#ocr-status');
+    status.classList.remove('hidden');
+
+    // If user hasn't run OCR yet but has selected a photo, run Tesseract first.
+    let ocrText = ($('#ocr') as HTMLTextAreaElement).value.trim();
+    const f = imgInput.files?.[0];
+    if (!ocrText && f) {
+      const twocol = ($('#twocol') as HTMLInputElement).checked;
+      const cropRhs = ($('#croprhs') as HTMLInputElement).checked;
+      try {
+        const text = await recognize(
+          f,
+          (label, pct) => {
+            status.textContent = `${label} ${pct}%`;
+          },
+          { columns: twocol ? 2 : 1, cropAnnotations: cropRhs },
+        );
+        ocrText = text.trim();
+        ($('#ocr') as HTMLTextAreaElement).value = ocrText;
+      } catch (err) {
+        status.textContent = 'OCR 失败：' + String(err);
+        return;
+      }
+    }
+    if (!ocrText) {
+      showErr('先选张照片或粘贴 OCR 文本');
+      return;
+    }
+    const lektion = Number(($('#lektion') as HTMLInputElement).value) || defaultLektion;
+    status.textContent = '🤖 DeepSeek 解析中…';
     try {
       const entries = await parseVocab(ocrText, lektion);
       status.textContent = `解析出 ${entries.length} 个词条。`;
-      await renderCandidates(entries);
+      await renderCandidates(entries, 'deepseek');
     } catch (err) {
       status.textContent = '解析失败：' + String(err);
     }
   });
 
-  const renderCandidates = async (entries: ParsedEntry[]): Promise<void> => {
+  const renderCandidates = async (entries: ParsedEntry[], source: string): Promise<void> => {
     const lektion = Number(($('#lektion') as HTMLInputElement).value) || defaultLektion;
     const existing = await db.words.toArray();
     const existingByLemma = new Map(existing.map((w) => [w.german.toLowerCase(), w]));
@@ -238,7 +279,7 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
         lektion,
         ...(page ? { page } : {}),
         ...(e.irregular ? { irregular: true } : {}),
-        source: 'gemini',
+        source,
         created_at: now,
       }));
       if (!words.length) {
