@@ -36,23 +36,41 @@ export async function getOcrWorker(onProgress?: ProgressFn) {
 export async function recognize(
   file: File,
   onProgress?: ProgressFn,
-  options: { columns?: 1 | 2 } = {},
+  options: { columns?: 1 | 2; cropAnnotations?: boolean } = {},
 ): Promise<string> {
   const worker = await getOcrWorker(onProgress);
   const url = URL.createObjectURL(file);
+  const crop = options.cropAnnotations ?? false;
   try {
     if (options.columns === 2) {
-      const [leftUrl, rightUrl] = await splitImageVertically(url);
+      let [leftUrl, rightUrl] = await splitImageVertically(url);
+      if (crop) {
+        const newLeft = await cropToLeftFraction(leftUrl, 0.62);
+        const newRight = await cropToLeftFraction(rightUrl, 0.62);
+        URL.revokeObjectURL(leftUrl);
+        URL.revokeObjectURL(rightUrl);
+        leftUrl = newLeft;
+        rightUrl = newRight;
+      }
       try {
-        onProgress?.('识别左栏', 0);
+        onProgress?.(crop ? '识别左栏（去手写）' : '识别左栏', 0);
         const left = await worker.recognize(leftUrl);
-        onProgress?.('识别右栏', 50);
+        onProgress?.(crop ? '识别右栏（去手写）' : '识别右栏', 50);
         const right = await worker.recognize(rightUrl);
         onProgress?.('识别完成', 100);
         return left.data.text.trim() + '\n\n=== 右栏 ===\n\n' + right.data.text.trim();
       } finally {
         URL.revokeObjectURL(leftUrl);
         URL.revokeObjectURL(rightUrl);
+      }
+    }
+    if (crop) {
+      const cropped = await cropToLeftFraction(url, 0.62);
+      try {
+        const { data } = await worker.recognize(cropped);
+        return data.text;
+      } finally {
+        URL.revokeObjectURL(cropped);
       }
     }
     const { data } = await worker.recognize(url);
@@ -66,7 +84,6 @@ async function splitImageVertically(url: string): Promise<[string, string]> {
   const img = await loadImage(url);
   const w = img.naturalWidth;
   const h = img.naturalHeight;
-  // Slight overlap so words on the seam aren't cut
   const overlap = Math.round(w * 0.03);
   const midX = Math.floor(w / 2);
   const leftEnd = Math.min(w, midX + overlap);
@@ -74,6 +91,12 @@ async function splitImageVertically(url: string): Promise<[string, string]> {
   const left = await cropToUrl(img, 0, 0, leftEnd, h);
   const right = await cropToUrl(img, rightStart, 0, w - rightStart, h);
   return [left, right];
+}
+
+async function cropToLeftFraction(url: string, fraction: number): Promise<string> {
+  const img = await loadImage(url);
+  const w = Math.floor(img.naturalWidth * fraction);
+  return cropToUrl(img, 0, 0, w, img.naturalHeight);
 }
 
 function loadImage(url: string): Promise<HTMLImageElement> {

@@ -32,7 +32,11 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
         </div>
         <label class="text-xs text-gray-600 flex items-center gap-2 -mt-1">
           <input id="twocol" type="checkbox" checked>
-          双栏切分（Aspekte 这种 2 列课本必勾）
+          双栏切分（2 列课本页必勾）
+        </label>
+        <label class="text-xs text-gray-600 flex items-center gap-2 -mt-2">
+          <input id="croprhs" type="checkbox" checked>
+          截除右侧手写笔记（Lernwortschatz 页带答题划线时勾上）
         </label>
         <div id="ocr-status" class="text-xs text-gray-500 hidden"></div>
         <textarea id="ocr" class="rounded-xl bg-gray-50 border p-2 text-sm font-mono" rows="4" placeholder="OCR 原始文本，或直接粘贴德语词列表"></textarea>
@@ -138,13 +142,14 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
     status.classList.remove('hidden');
     status.textContent = '准备 OCR…';
     const twocol = ($('#twocol') as HTMLInputElement).checked;
+    const cropRhs = ($('#croprhs') as HTMLInputElement).checked;
     try {
       const text = await recognize(
         f,
         (label, pct) => {
           status.textContent = `${label} ${pct}%`;
         },
-        { columns: twocol ? 2 : 1 },
+        { columns: twocol ? 2 : 1, cropAnnotations: cropRhs },
       );
       ($('#ocr') as HTMLTextAreaElement).value = text.trim();
       status.textContent = `OCR 完成（${text.trim().length} 字符）。点 🤖 DeepSeek 解析。`;
