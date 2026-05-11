@@ -1,5 +1,6 @@
 import { db } from '../db';
 import { getSettings, updateSettings } from '../store';
+import { getGeminiKey, setGeminiKey } from '../lib/gemini';
 
 export async function renderSettings(root: HTMLElement): Promise<void | (() => void)> {
   const s = getSettings();
@@ -29,6 +30,15 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
 
         <hr class="my-3">
 
+        <h3 class="text-sm font-semibold">Gemini API（用于"添加单词"的 🤖 自动解析）</h3>
+        <label class="text-sm">
+          <span class="text-gray-500">API key（仅存本机 localStorage，导出 JSON 不含）</span>
+          <input id="gkey" type="password" class="w-full mt-1 rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="AIzaSy..." value="${getGeminiKey()}">
+        </label>
+        <p class="text-xs text-gray-400">免费 key: <a href="https://aistudio.google.com/apikey" target="_blank" class="text-blue-600 underline">aistudio.google.com/apikey</a></p>
+
+        <hr class="my-3">
+
         <h3 class="text-sm font-semibold">数据</h3>
         <button id="export" class="rounded-xl bg-gray-100 py-2">导出 JSON</button>
         <input id="importFile" type="file" accept="application/json" class="hidden">
@@ -51,7 +61,17 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
     msg.textContent = '已保存';
     setTimeout(() => (msg.textContent = ''), 1500);
   };
-  root.querySelectorAll('input').forEach((el) => el.addEventListener('change', persist));
+  root.querySelectorAll('input').forEach((el) => {
+    if (el.id === 'gkey') return;
+    el.addEventListener('change', persist);
+  });
+
+  const gkeyInput = root.querySelector('#gkey') as HTMLInputElement;
+  gkeyInput.addEventListener('change', () => {
+    setGeminiKey(gkeyInput.value.trim());
+    msg.textContent = 'API key 已保存';
+    setTimeout(() => (msg.textContent = ''), 1500);
+  });
 
   root.querySelector('#export')!.addEventListener('click', async () => {
     const dump = {
