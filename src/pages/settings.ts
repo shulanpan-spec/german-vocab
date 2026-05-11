@@ -1,6 +1,12 @@
 import { db } from '../db';
 import { getSettings, updateSettings } from '../store';
-import { getGeminiKey, setGeminiKey } from '../lib/gemini';
+import {
+  getKey,
+  setKey,
+  getProvider,
+  setProvider,
+  type Provider,
+} from '../lib/gemini';
 
 export async function renderSettings(root: HTMLElement): Promise<void | (() => void)> {
   const s = getSettings();
@@ -30,17 +36,36 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
 
         <hr class="my-3">
 
-        <h3 class="text-sm font-semibold">Gemini API（用于"添加单词"的 🤖 自动解析）</h3>
+        <h3 class="text-sm font-semibold">LLM API（用于"添加单词"的 🤖 自动解析）</h3>
         <label class="text-sm">
-          <span class="text-gray-500">API key（仅存本机 localStorage，导出 JSON 不含）</span>
-          <input id="gkey" type="password" class="w-full mt-1 rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="AIzaSy..." value="${getGeminiKey()}">
+          <span class="text-gray-500">服务商</span>
+          <select id="provider" class="w-full mt-1 rounded-lg bg-gray-100 px-3 py-2">
+            <option value="gemini" ${getProvider() === 'gemini' ? 'selected' : ''}>Google Gemini（境外免费 1500/天）</option>
+            <option value="deepseek" ${getProvider() === 'deepseek' ? 'selected' : ''}>DeepSeek（中国大陆可直连，¥0.001/页）</option>
+          </select>
         </label>
-        <div class="flex gap-2 items-center">
-          <button id="gkey-save" class="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm font-medium">保存 key</button>
-          <button id="gkey-clear" class="rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-sm">清除</button>
-          <span id="gkey-status" class="text-sm text-gray-500"></span>
-        </div>
-        <p class="text-xs text-gray-400">免费 key: <a href="https://aistudio.google.com/apikey" target="_blank" class="text-blue-600 underline">aistudio.google.com/apikey</a> · 当前: ${getGeminiKey() ? '<span class="text-green-700">已配置</span>' : '<span class="text-gray-400">未配置</span>'}</p>
+
+        <details ${getProvider() === 'gemini' ? 'open' : ''} class="text-sm">
+          <summary class="text-gray-500 mb-2 cursor-pointer">Gemini key ${getKey('gemini') ? '<span class="text-green-700">✓</span>' : ''}</summary>
+          <input id="gkey" type="password" class="w-full rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="AIzaSy..." value="${getKey('gemini')}">
+          <div class="flex gap-2 items-center mt-2">
+            <button data-save="gemini" class="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm font-medium">保存</button>
+            <button data-clear="gemini" class="rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-sm">清除</button>
+          </div>
+          <p class="text-xs text-gray-400 mt-1"><a href="https://aistudio.google.com/apikey" target="_blank" class="text-blue-600 underline">aistudio.google.com/apikey</a></p>
+        </details>
+
+        <details ${getProvider() === 'deepseek' ? 'open' : ''} class="text-sm">
+          <summary class="text-gray-500 mb-2 cursor-pointer">DeepSeek key ${getKey('deepseek') ? '<span class="text-green-700">✓</span>' : ''}</summary>
+          <input id="dkey" type="password" class="w-full rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="sk-..." value="${getKey('deepseek')}">
+          <div class="flex gap-2 items-center mt-2">
+            <button data-save="deepseek" class="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm font-medium">保存</button>
+            <button data-clear="deepseek" class="rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-sm">清除</button>
+          </div>
+          <p class="text-xs text-gray-400 mt-1"><a href="https://platform.deepseek.com/api_keys" target="_blank" class="text-blue-600 underline">platform.deepseek.com/api_keys</a></p>
+        </details>
+
+        <span id="gkey-status" class="text-sm text-gray-500"></span>
 
         <hr class="my-3">
 
@@ -71,26 +96,41 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
     el.addEventListener('change', persist);
   });
 
-  const gkeyInput = root.querySelector('#gkey') as HTMLInputElement;
-  const gkeyStatus = root.querySelector('#gkey-status') as HTMLSpanElement;
+  const keyStatus = root.querySelector('#gkey-status') as HTMLSpanElement;
   const flashStatus = (msg: string, ok = true): void => {
-    gkeyStatus.textContent = msg;
-    gkeyStatus.className = `text-sm ${ok ? 'text-green-700' : 'text-red-600'}`;
-    setTimeout(() => (gkeyStatus.textContent = ''), 3000);
+    keyStatus.textContent = msg;
+    keyStatus.className = `text-sm ${ok ? 'text-green-700' : 'text-red-600'}`;
+    setTimeout(() => (keyStatus.textContent = ''), 3000);
   };
-  root.querySelector('#gkey-save')!.addEventListener('click', () => {
-    const v = gkeyInput.value.trim();
-    if (!v) {
-      flashStatus('未输入 key', false);
-      return;
-    }
-    setGeminiKey(v);
-    flashStatus('✓ 已保存（' + v.slice(0, 8) + '…）');
+  const providerSel = root.querySelector('#provider') as HTMLSelectElement;
+  providerSel.addEventListener('change', () => {
+    setProvider(providerSel.value as Provider);
+    flashStatus('✓ 服务商已切到 ' + providerSel.options[providerSel.selectedIndex].text);
   });
-  root.querySelector('#gkey-clear')!.addEventListener('click', () => {
-    setGeminiKey('');
-    gkeyInput.value = '';
-    flashStatus('已清除');
+
+  const inputFor: Record<Provider, HTMLInputElement> = {
+    gemini: root.querySelector('#gkey') as HTMLInputElement,
+    deepseek: root.querySelector('#dkey') as HTMLInputElement,
+  };
+  root.querySelectorAll<HTMLButtonElement>('button[data-save]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const p = btn.dataset.save as Provider;
+      const v = inputFor[p].value.trim();
+      if (!v) {
+        flashStatus(`${p} key 未输入`, false);
+        return;
+      }
+      setKey(p, v);
+      flashStatus(`✓ ${p} key 已保存（${v.slice(0, 8)}…）`);
+    });
+  });
+  root.querySelectorAll<HTMLButtonElement>('button[data-clear]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const p = btn.dataset.clear as Provider;
+      setKey(p, '');
+      inputFor[p].value = '';
+      flashStatus(`${p} key 已清除`);
+    });
   });
 
   root.querySelector('#export')!.addEventListener('click', async () => {

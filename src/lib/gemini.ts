@@ -10,16 +10,36 @@ export interface ParsedEntry {
   irregular?: boolean;
 }
 
-const KEY_STORAGE = 'gemini_api_key';
-const MODEL = 'gemini-2.0-flash';
+export type Provider = 'gemini' | 'deepseek';
+const PROVIDER_STORAGE = 'llm_provider';
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const DEEPSEEK_MODEL = 'deepseek-chat';
 
-export function getGeminiKey(): string {
-  return localStorage.getItem(KEY_STORAGE) ?? '';
+export function getProvider(): Provider {
+  const v = localStorage.getItem(PROVIDER_STORAGE);
+  return v === 'deepseek' ? 'deepseek' : 'gemini';
+}
+export function setProvider(p: Provider): void {
+  localStorage.setItem(PROVIDER_STORAGE, p);
 }
 
-export function setGeminiKey(key: string): void {
-  if (key) localStorage.setItem(KEY_STORAGE, key);
-  else localStorage.removeItem(KEY_STORAGE);
+export function getKey(p: Provider): string {
+  return localStorage.getItem(`${p}_api_key`) ?? '';
+}
+export function setKey(p: Provider, key: string): void {
+  if (key) localStorage.setItem(`${p}_api_key`, key);
+  else localStorage.removeItem(`${p}_api_key`);
+}
+
+// Legacy aliases (existing call sites)
+export const getGeminiKey = (): string => getKey('gemini');
+export const setGeminiKey = (k: string): void => setKey('gemini', k);
+
+export function hasActiveKey(): boolean {
+  return getKey(getProvider()).length > 0;
+}
+export function activeProviderLabel(): string {
+  return getProvider() === 'deepseek' ? 'DeepSeek' : 'Gemini';
 }
 
 const PROMPT = `You produce structured German B2 vocabulary entries in the style of the textbook "Aspekte neu B2".
@@ -61,26 +81,26 @@ const SCHEMA = {
 };
 
 export async function parseVocab(text: string, lektion: number): Promise<ParsedEntry[]> {
-  const key = getGeminiKey();
-  if (!key) throw new Error('未配置 Gemini API key（去 Settings 填）');
   if (!text.trim()) throw new Error('OCR 文本为空');
+  const provider = getProvider();
+  return provider === 'deepseek'
+    ? parseWithDeepSeek(text, lektion)
+    : parseWithGemini(text, lektion);
+}
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${encodeURIComponent(key)}`;
+async function parseWithGemini(text: string, lektion: number): Promise<ParsedEntry[]> {
+  const key = getKey('gemini');
+  if (!key) throw new Error('未配置 Gemini API key');
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(key)}`;
   const body = {
-    contents: [
-      {
-        parts: [
-          { text: PROMPT + `\n\nLektion: ${lektion}\n\nOCR text:\n${text}` },
-        ],
-      },
-    ],
+    contents: [{ parts: [{ text: PROMPT + `\n\nLektion: ${lektion}\n\nOCR text:\n${text}` }] }],
     generationConfig: {
       responseMimeType: 'application/json',
       responseSchema: SCHEMA,
       temperature: 0.1,
     },
   };
-
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -93,7 +113,44 @@ export async function parseVocab(text: string, lektion: number): Promise<ParsedE
   const data = await res.json();
   const out = data?.candidates?.[0]?.content?.parts?.[0]?.text;
   if (typeof out !== 'string') throw new Error('Gemini 返回结构异常');
-  const parsed = JSON.parse(out) as ParsedEntry[];
+  const parsed = JSON.parse(out);
   if (!Array.isArray(parsed)) throw new Error('Gemini 未返回数组');
-  return parsed.filter((e) => e.german && e.chinese?.length);
+  return (parsed as ParsedEntry[]).filter((e) => e.german && e.chinese?.length);
+}
+
+async function parseWithDeepSeek(text: string, lektion: number): Promise<ParsedEntry[]> {
+  const key = getKey('deepseek');
+  if (!key) throw new Error('未配置 DeepSeek API key');
+
+  const systemPrompt = PROMPT +
+    '\n\nReturn a JSON object exactly in this shape: {"entries": [/* array of entry objects as described */]}. Output JSON only.';
+
+  const body = {
+    model: DEEPSEEK_MODEL,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `Lektion: ${lektion}\n\nOCR text:\n${text}` },
+    ],
+    response_format: { type: 'json_object' },
+    temperature: 0.1,
+  };
+  const res = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`DeepSeek ${res.status}: ${errText.slice(0, 500)}`);
+  }
+  const data = await res.json();
+  const content = data?.choices?.[0]?.message?.content;
+  if (typeof content !== 'string') throw new Error('DeepSeek 返回结构异常');
+  const obj = JSON.parse(content);
+  const arr = Array.isArray(obj) ? obj : obj.entries ?? obj.words ?? obj.vocabulary ?? [];
+  if (!Array.isArray(arr)) throw new Error('DeepSeek 未返回数组（实际: ' + Object.keys(obj).join(',') + '）');
+  return (arr as ParsedEntry[]).filter((e) => e?.german && e.chinese?.length);
 }

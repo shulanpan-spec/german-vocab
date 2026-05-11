@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { recognize } from '../lib/ocr';
-import { parseVocab, getGeminiKey, type ParsedEntry } from '../lib/gemini';
+import { parseVocab, hasActiveKey, activeProviderLabel, type ParsedEntry } from '../lib/gemini';
 import type { Article, POS, Word } from '../types';
 
 export interface AddWordModalOpts {
@@ -25,10 +25,10 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
       <div class="px-5 py-4 flex flex-col gap-3">
         <div class="flex gap-2">
           <label class="flex-1 rounded-xl bg-gray-100 py-2 px-3 text-sm flex items-center justify-center cursor-pointer">
-            📷 拍照 / 选图
-            <input id="img" type="file" accept="image/*" capture="environment" class="hidden">
+            📷 拍照 / 相册
+            <input id="img" type="file" accept="image/*" class="hidden">
           </label>
-          <button id="parse" class="flex-1 rounded-xl bg-blue-100 text-blue-800 py-2 px-3 text-sm">🤖 Gemini 解析</button>
+          <button id="parse" class="flex-1 rounded-xl bg-blue-100 text-blue-800 py-2 px-3 text-sm">🤖 ${activeProviderLabel()} 解析</button>
         </div>
         <div id="ocr-status" class="text-xs text-gray-500 hidden"></div>
         <textarea id="ocr" class="rounded-xl bg-gray-50 border p-2 text-sm font-mono" rows="4" placeholder="OCR 原始文本，或直接粘贴德语词列表"></textarea>
@@ -146,8 +146,8 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
 
   // ── Gemini parse ─────────────────────────────────────────────
   $('#parse').addEventListener('click', async () => {
-    if (!getGeminiKey()) {
-      showErr('未配置 Gemini API key — 去 Settings 填');
+    if (!hasActiveKey()) {
+      showErr(`未配置 ${activeProviderLabel()} API key — 去 Settings 填`);
       return;
     }
     const ocrText = ($('#ocr') as HTMLTextAreaElement).value.trim();
@@ -158,7 +158,7 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
     const lektion = Number(($('#lektion') as HTMLInputElement).value) || defaultLektion;
     const status = $('#ocr-status');
     status.classList.remove('hidden');
-    status.textContent = '🤖 Gemini 解析中…';
+    status.textContent = `🤖 ${activeProviderLabel()} 解析中…`;
     try {
       const entries = await parseVocab(ocrText, lektion);
       status.textContent = `解析出 ${entries.length} 个词条。`;
