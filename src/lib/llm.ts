@@ -31,7 +31,10 @@ export function hasKey(): boolean {
 
 // ── Zhipu GLM-4V-Flash (image → JSON path, one-step, free tier) ────────
 const ZP_KEY = 'zhipu_api_key';
-const ZP_MODEL = 'glm-4v-flash';
+// glm-4v-flash explicitly does NOT accept base64 ("GLM-4V-Flash限制1张图像且不支持
+// Base64编码" — official docs). The newer glm-4.6v-flash is also free AND accepts
+// base64 in image_url.url as a raw string (no data: prefix).
+const ZP_MODEL = 'glm-4.6v-flash';
 
 export function getZhipuKey(): string {
   return localStorage.getItem(ZP_KEY) ?? '';
@@ -139,7 +142,9 @@ export async function parseVocabFromImage(
   const key = getZhipuKey();
   if (!key) throw new Error('未配置 智谱 API key（去 Settings 填）');
 
-  const dataUrl = await fileToDownscaledDataUrl(file, 1920);
+  // Zhipu's image_url.url accepts a raw base64 string (no data: prefix) per
+  // the glm-4.6v-flash docs.
+  const base64 = await fileToDownscaledBase64(file, 1920);
 
   const body = {
     model: ZP_MODEL,
@@ -147,11 +152,11 @@ export async function parseVocabFromImage(
       {
         role: 'user',
         content: [
+          { type: 'image_url', image_url: { url: base64 } },
           {
             type: 'text',
             text: `${VISION_PROMPT}\n\nLektion: ${lektion}`,
           },
-          { type: 'image_url', image_url: { url: dataUrl } },
         ],
       },
     ],
@@ -205,10 +210,11 @@ function parseEntriesFromJsonString(content: string, provider: string): ParsedEn
   return (arr as ParsedEntry[]).filter((e) => e?.german && e.chinese?.length);
 }
 
-// Phone photos can be 3-8 MB; GLM-4V handles up to ~5 MB / longest-edge 6000px
-// but 1920px on the long edge is plenty for textbook OCR-equivalent recall and
-// keeps the base64 payload well under provider limits.
-async function fileToDownscaledDataUrl(file: File, maxDim: number): Promise<string> {
+// Phone photos can be 3-8 MB; downscale to 1920px on the long edge to keep the
+// base64 payload well under provider limits while preserving enough detail for
+// textbook lemma extraction. Returns RAW base64 (no data: prefix) because that
+// is what glm-4.6v-flash's image_url.url field accepts.
+async function fileToDownscaledBase64(file: File, maxDim: number): Promise<string> {
   const url = URL.createObjectURL(file);
   try {
     const img = await new Promise<HTMLImageElement>((res, rej) => {
@@ -230,7 +236,10 @@ async function fileToDownscaledDataUrl(file: File, maxDim: number): Promise<stri
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, 0, 0, w, h);
-    return c.toDataURL('image/jpeg', 0.9);
+    const dataUrl = c.toDataURL('image/jpeg', 0.9);
+    // Strip "data:image/jpeg;base64," prefix → bare base64 string.
+    const comma = dataUrl.indexOf(',');
+    return comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
   } finally {
     URL.revokeObjectURL(url);
   }

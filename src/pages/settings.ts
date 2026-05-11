@@ -30,7 +30,7 @@ export async function renderSettings(root: HTMLElement): Promise<void | (() => v
 
         <hr class="my-3">
 
-        <h3 class="text-sm font-semibold">智谱 GLM-4V-Flash（推荐 · 视觉直解 · 免费）</h3>
+        <h3 class="text-sm font-semibold">智谱 GLM-4.6V-Flash（推荐 · 视觉直解 · 免费）</h3>
         <label class="text-sm">
           <span class="text-gray-500">API key（仅存本机 localStorage，导出 JSON 不含）</span>
           <input id="zkey" type="password" class="w-full mt-1 rounded-lg bg-gray-100 px-3 py-2 font-mono text-xs" placeholder="xxxxxxxxxxxx.xxxxxxxx" value="${getZhipuKey()}">
