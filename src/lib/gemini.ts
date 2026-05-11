@@ -17,7 +17,9 @@ const DEEPSEEK_MODEL = 'deepseek-chat';
 
 export function getProvider(): Provider {
   const v = localStorage.getItem(PROVIDER_STORAGE);
-  return v === 'deepseek' ? 'deepseek' : 'gemini';
+  if (v === 'gemini' || v === 'deepseek') return v;
+  // No explicit choice yet → default to DeepSeek (CN-friendly)
+  return 'deepseek';
 }
 export function setProvider(p: Provider): void {
   localStorage.setItem(PROVIDER_STORAGE, p);
