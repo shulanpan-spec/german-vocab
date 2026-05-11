@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { recognize } from '../lib/ocr';
-import { parseVocab, hasActiveKey, activeProviderLabel, type ParsedEntry } from '../lib/gemini';
+import { parseVocab, hasKey, type ParsedEntry } from '../lib/llm';
 import type { Article, POS, Word } from '../types';
 
 export interface AddWordModalOpts {
@@ -28,7 +28,7 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
             📷 拍照 / 相册
             <input id="img" type="file" accept="image/*" class="hidden">
           </label>
-          <button id="parse" class="flex-1 rounded-xl bg-blue-100 text-blue-800 py-2 px-3 text-sm">🤖 ${activeProviderLabel()} 解析</button>
+          <button id="parse" class="flex-1 rounded-xl bg-blue-100 text-blue-800 py-2 px-3 text-sm">🤖 DeepSeek 解析</button>
         </div>
         <label class="text-xs text-gray-600 flex items-center gap-2 -mt-1">
           <input id="twocol" type="checkbox" checked>
@@ -147,7 +147,7 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
         { columns: twocol ? 2 : 1 },
       );
       ($('#ocr') as HTMLTextAreaElement).value = text.trim();
-      status.textContent = `OCR 完成（${text.trim().length} 字符）。点 🤖 ${activeProviderLabel()} 解析。`;
+      status.textContent = `OCR 完成（${text.trim().length} 字符）。点 🤖 DeepSeek 解析。`;
     } catch (err) {
       status.textContent = '识别失败：' + String(err);
     }
@@ -155,8 +155,8 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
 
   // ── Gemini parse ─────────────────────────────────────────────
   $('#parse').addEventListener('click', async () => {
-    if (!hasActiveKey()) {
-      showErr(`未配置 ${activeProviderLabel()} API key — 去 Settings 填`);
+    if (!hasKey()) {
+      showErr('未配置 DeepSeek API key — 去 Settings 填');
       return;
     }
     const ocrText = ($('#ocr') as HTMLTextAreaElement).value.trim();
@@ -167,7 +167,7 @@ export function openAddWordModal(opts: AddWordModalOpts): () => void {
     const lektion = Number(($('#lektion') as HTMLInputElement).value) || defaultLektion;
     const status = $('#ocr-status');
     status.classList.remove('hidden');
-    status.textContent = `🤖 ${activeProviderLabel()} 解析中…`;
+    status.textContent = `🤖 DeepSeek 解析中…`;
     try {
       const entries = await parseVocab(ocrText, lektion);
       status.textContent = `解析出 ${entries.length} 个词条。`;

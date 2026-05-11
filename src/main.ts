@@ -4,8 +4,10 @@ import { seedAll } from './seed';
 import { loadSettings } from './store';
 import { registerRoute, setFallback, startRouter } from './router';
 import { warmUpTTS } from './tts';
+import { cleanupLegacyKeys } from './lib/llm';
 
 async function boot(): Promise<void> {
+  cleanupLegacyKeys();
   await db.open();
   await seedAll();
   await loadSettings();
