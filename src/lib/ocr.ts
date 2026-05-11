@@ -54,11 +54,11 @@ export async function recognize(
       }
       try {
         onProgress?.(crop ? '识别左栏（去手写）' : '识别左栏', 0);
-        const left = await worker.recognize(leftUrl);
+        const leftText = await ocrPreprocessed(worker, leftUrl);
         onProgress?.(crop ? '识别右栏（去手写）' : '识别右栏', 50);
-        const right = await worker.recognize(rightUrl);
+        const rightText = await ocrPreprocessed(worker, rightUrl);
         onProgress?.('识别完成', 100);
-        return left.data.text.trim() + '\n\n=== 右栏 ===\n\n' + right.data.text.trim();
+        return leftText.trim() + '\n\n=== 右栏 ===\n\n' + rightText.trim();
       } finally {
         URL.revokeObjectURL(leftUrl);
         URL.revokeObjectURL(rightUrl);
@@ -67,17 +67,79 @@ export async function recognize(
     if (crop) {
       const cropped = await cropToLeftFraction(url, 0.62);
       try {
-        const { data } = await worker.recognize(cropped);
-        return data.text;
+        return await ocrPreprocessed(worker, cropped);
       } finally {
         URL.revokeObjectURL(cropped);
       }
     }
-    const { data } = await worker.recognize(url);
-    return data.text;
+    return await ocrPreprocessed(worker, url);
   } finally {
     URL.revokeObjectURL(url);
   }
+}
+
+// Preprocess + recognize one image URL. Tesseract.js LSTM works much better
+// at 300+ DPI; phone photos of textbook pages are ~150-200 DPI equivalent.
+// We upscale 2x with high-quality interpolation, then collapse to grayscale
+// and stretch contrast to full 0-255 range — this sharpens character edges
+// for small diacritics (¨, ´) and plural markers (`, -e`, `, -en`) that
+// Tesseract was previously dropping or garbling.
+async function ocrPreprocessed(
+  worker: { recognize: (img: string) => Promise<{ data: { text: string } }> },
+  url: string,
+): Promise<string> {
+  const pre = await preprocess(url);
+  try {
+    const { data } = await worker.recognize(pre);
+    return data.text;
+  } finally {
+    URL.revokeObjectURL(pre);
+  }
+}
+
+async function preprocess(url: string): Promise<string> {
+  const img = await loadImage(url);
+  const scale = 2;
+  const w = Math.floor(img.naturalWidth * scale);
+  const h = Math.floor(img.naturalHeight * scale);
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d');
+  if (!ctx) throw new Error('canvas 2d context unavailable');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, w, h);
+
+  const imageData = ctx.getImageData(0, 0, w, h);
+  const px = imageData.data;
+  // Single pass: compute luminance min/max for contrast stretch.
+  let min = 255;
+  let max = 0;
+  for (let i = 0; i < px.length; i += 4) {
+    const lum = (px[i] + px[i + 1] + px[i + 2]) / 3;
+    if (lum < min) min = lum;
+    if (lum > max) max = lum;
+  }
+  // Clip 2% on each end to ignore outliers (dust spots, paper bleed-through).
+  const lo = min + (max - min) * 0.02;
+  const hi = max - (max - min) * 0.02;
+  const range = Math.max(1, hi - lo);
+  for (let i = 0; i < px.length; i += 4) {
+    const lum = (px[i] + px[i + 1] + px[i + 2]) / 3;
+    const stretched = Math.max(0, Math.min(255, Math.round(((lum - lo) / range) * 255)));
+    px[i] = stretched;
+    px[i + 1] = stretched;
+    px[i + 2] = stretched;
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  return new Promise((res, rej) => {
+    c.toBlob((b) => {
+      if (!b) return rej(new Error('canvas toBlob failed'));
+      res(URL.createObjectURL(b));
+    }, 'image/png');
+  });
 }
 
 async function splitImageVertically(url: string): Promise<[string, string]> {
