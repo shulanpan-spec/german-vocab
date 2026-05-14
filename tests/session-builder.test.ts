@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { buildChoices, pickExtraPractice } from '../src/lib/session-builder';
-import type { ReviewState, Word } from '../src/types';
+import {
+  buildChoices,
+  pickExtraPractice,
+  requeueForRelearn,
+  MAX_RELEARNS_PER_WORD,
+} from '../src/lib/session-builder';
+import type { Grade, ReviewState, Word } from '../src/types';
 
 const w = (id: string, chinese: string[], lektion = 7): Word => ({
   id, german: 'X', pos: 'noun', chinese, german_synonyms: [], lektion, created_at: 0,
@@ -67,5 +72,72 @@ describe('pickExtraPractice', () => {
   });
   it('returns empty when no words exist', () => {
     expect(pickExtraPractice([], [], 10)).toEqual([]);
+  });
+});
+
+describe('requeueForRelearn', () => {
+  const longQueue: Word[] = Array.from({ length: 20 }, (_, k) =>
+    w(`w${k}`, [`m${k}`]),
+  );
+
+  it('grade 0 inserts at offset 3..5 from currentIdx (rand=0 → +3)', () => {
+    const out = requeueForRelearn(longQueue, 2, 0 as Grade, 0, () => 0);
+    expect(out).toHaveLength(longQueue.length + 1);
+    expect(out[2 + 3].id).toBe('w2');
+  });
+
+  it('grade 0 with rand=0.999 → +5', () => {
+    const out = requeueForRelearn(longQueue, 2, 0 as Grade, 0, () => 0.999);
+    expect(out[2 + 5].id).toBe('w2');
+  });
+
+  it('grade 1 inserts at offset 8..10 (rand=0 → +8)', () => {
+    const out = requeueForRelearn(longQueue, 1, 1 as Grade, 0, () => 0);
+    expect(out).toHaveLength(longQueue.length + 1);
+    expect(out[1 + 8].id).toBe('w1');
+  });
+
+  it('grade 1 with rand=0.999 → +10', () => {
+    const out = requeueForRelearn(longQueue, 1, 1 as Grade, 0, () => 0.999);
+    expect(out[1 + 10].id).toBe('w1');
+  });
+
+  it('grade 2 is a no-op', () => {
+    const out = requeueForRelearn(longQueue, 2, 2 as Grade, 0, () => 0);
+    expect(out).toEqual(longQueue);
+  });
+
+  it('grade 3 is a no-op', () => {
+    const out = requeueForRelearn(longQueue, 2, 3 as Grade, 0, () => 0);
+    expect(out).toEqual(longQueue);
+  });
+
+  it(`stops re-queuing after ${MAX_RELEARNS_PER_WORD} times`, () => {
+    const out = requeueForRelearn(
+      longQueue,
+      0,
+      0 as Grade,
+      MAX_RELEARNS_PER_WORD,
+      () => 0,
+    );
+    expect(out).toEqual(longQueue);
+  });
+
+  it('appends at end when offset would overshoot', () => {
+    const small = longQueue.slice(0, 4);
+    const out = requeueForRelearn(small, 3, 0 as Grade, 0, () => 0);
+    expect(out).toHaveLength(5);
+    expect(out[out.length - 1].id).toBe('w3');
+  });
+
+  it('does not mutate input queue', () => {
+    const original = [...longQueue];
+    requeueForRelearn(longQueue, 2, 0 as Grade, 0, () => 0);
+    expect(longQueue).toEqual(original);
+  });
+
+  it('returns same array when currentIdx is out of range', () => {
+    const out = requeueForRelearn(longQueue, 99, 0 as Grade, 0, () => 0);
+    expect(out).toEqual(longQueue);
   });
 });

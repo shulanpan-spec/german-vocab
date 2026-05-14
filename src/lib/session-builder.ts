@@ -1,7 +1,13 @@
-import type { ReviewState, Word } from '../types';
+import type { Grade, ReviewState, Word } from '../types';
 import type { CardChoice } from '../components/card';
 
 type Rand = () => number;
+
+export const MAX_RELEARNS_PER_WORD = 2;
+const RELEARN_OFFSET: Record<0 | 1, [number, number]> = {
+  0: [3, 5],
+  1: [8, 10],
+};
 
 export function buildChoices(target: Word, pool: Word[], rand: Rand = Math.random): CardChoice[] {
   const distractorsPool = pool.filter((w) => w.id !== target.id);
@@ -48,6 +54,25 @@ export function pickSessionWords(
   const newOnly = [...newWords].slice(0, n);
   shuffle(newOnly, rand);
   return [...dueOnly, ...newOnly].slice(0, sessionSize);
+}
+
+export function requeueForRelearn(
+  queue: Word[],
+  currentIdx: number,
+  grade: Grade,
+  relearnCount: number,
+  rand: Rand = Math.random,
+): Word[] {
+  if (grade !== 0 && grade !== 1) return queue;
+  if (relearnCount >= MAX_RELEARNS_PER_WORD) return queue;
+  const word = queue[currentIdx];
+  if (!word) return queue;
+  const [min, max] = RELEARN_OFFSET[grade];
+  const offset = min + Math.floor(rand() * (max - min + 1));
+  const insertAt = Math.min(currentIdx + offset, queue.length);
+  const next = [...queue];
+  next.splice(insertAt, 0, word);
+  return next;
 }
 
 export function pickExtraPractice(
