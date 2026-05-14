@@ -1,4 +1,4 @@
-import type { Word } from '../types';
+import type { ReviewState, Word } from '../types';
 import type { CardChoice } from '../components/card';
 
 type Rand = () => number;
@@ -48,4 +48,19 @@ export function pickSessionWords(
   const newOnly = [...newWords].slice(0, n);
   shuffle(newOnly, rand);
   return [...dueOnly, ...newOnly].slice(0, sessionSize);
+}
+
+export function pickExtraPractice(
+  words: Word[],
+  states: ReviewState[],
+  sessionSize: number,
+): Word[] {
+  if (words.length === 0) return [];
+  const stateMap = new Map(states.map((s) => [s.word_id, s]));
+  const sorted = [...words].sort((a, b) => {
+    const da = stateMap.get(a.id)?.due_at ?? 0;
+    const db = stateMap.get(b.id)?.due_at ?? 0;
+    return da - db;
+  });
+  return sorted.slice(0, sessionSize);
 }

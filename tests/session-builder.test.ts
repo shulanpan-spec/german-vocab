@@ -1,9 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { buildChoices } from '../src/lib/session-builder';
-import type { Word } from '../src/types';
+import { buildChoices, pickExtraPractice } from '../src/lib/session-builder';
+import type { ReviewState, Word } from '../src/types';
 
 const w = (id: string, chinese: string[], lektion = 7): Word => ({
   id, german: 'X', pos: 'noun', chinese, german_synonyms: [], lektion, created_at: 0,
+});
+
+const s = (word_id: string, due_at: number): ReviewState => ({
+  word_id, easiness: 2.5, interval: 1, repetitions: 1, due_at,
 });
 
 describe('buildChoices', () => {
@@ -37,5 +41,31 @@ describe('buildChoices', () => {
     const choices = buildChoices(pool[0], small, () => 0);
     const opts = choices.filter((c) => c.kind === 'option');
     expect(opts.length).toBeLessThanOrEqual(small.length);
+  });
+});
+
+describe('pickExtraPractice', () => {
+  const words = [
+    w('a', ['苹果']),
+    w('b', ['香蕉']),
+    w('c', ['橙子']),
+    w('d', ['西瓜']),
+  ];
+  it('returns words sorted by soonest due_at first', () => {
+    const states = [s('a', 5000), s('b', 1000), s('c', 3000), s('d', 2000)];
+    const got = pickExtraPractice(words, states, 4).map((x) => x.id);
+    expect(got).toEqual(['b', 'd', 'c', 'a']);
+  });
+  it('caps at sessionSize', () => {
+    const states = [s('a', 5000), s('b', 1000), s('c', 3000), s('d', 2000)];
+    expect(pickExtraPractice(words, states, 2)).toHaveLength(2);
+  });
+  it('treats unreviewed words as due_at 0 (come first)', () => {
+    const states = [s('a', 5000), s('b', 1000)];
+    const got = pickExtraPractice(words, states, 4).map((x) => x.id);
+    expect(got.slice(0, 2).sort()).toEqual(['c', 'd']);
+  });
+  it('returns empty when no words exist', () => {
+    expect(pickExtraPractice([], [], 10)).toEqual([]);
   });
 });

@@ -1,7 +1,7 @@
 import { db, dueWordIds, saveReview } from '../db';
 import { applyGrade, initialReview } from '../srs';
 import { renderCard, renderDetail, type CardChoice } from '../components/card';
-import { buildChoices, pickSessionWords } from '../lib/session-builder';
+import { buildChoices, pickExtraPractice, pickSessionWords } from '../lib/session-builder';
 import { getSettings } from '../store';
 import { navigate } from '../router';
 import type { Grade, Word } from '../types';
@@ -23,13 +23,18 @@ export async function renderSession(root: HTMLElement): Promise<void | (() => vo
     if (!w) continue;
     if (seen.has(id)) due.push(w); else newWords.push(w);
   }
-  const queue = pickSessionWords(due, newWords, settings.session_size, settings.daily_new_target);
+  let queue = pickSessionWords(due, newWords, settings.session_size, settings.daily_new_target);
+  let extraPractice = false;
+  if (queue.length === 0) {
+    queue = pickExtraPractice(allWords, states, settings.session_size);
+    extraPractice = queue.length > 0;
+  }
 
   if (queue.length === 0) {
     root.innerHTML = `
       <div class="p-8 text-center">
-        <p class="text-2xl mb-4">🎉</p>
-        <p>今天没有待复习的卡了。</p>
+        <p class="text-2xl mb-4">📭</p>
+        <p>词库还是空的，去添加一些单词吧。</p>
         <button id="back" class="mt-6 rounded-2xl bg-gray-900 text-white px-6 py-3">回首页</button>
       </div>`;
     root.querySelector('#back')!.addEventListener('click', () => navigate('#/home'));
@@ -48,7 +53,10 @@ export async function renderSession(root: HTMLElement): Promise<void | (() => vo
       <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden">
         <div id="bar" class="h-full bg-gray-900 transition-all" style="width:0%"></div>
       </div>
-      <div class="text-xs text-gray-500 mt-1 text-right" id="counter"></div>
+      <div class="flex justify-between text-xs text-gray-500 mt-1">
+        <span id="mode">${extraPractice ? '加练模式' : ''}</span>
+        <span id="counter"></span>
+      </div>
     </div>
     <div id="card-host" class="flex-1"></div>
   `;
@@ -60,13 +68,20 @@ export async function renderSession(root: HTMLElement): Promise<void | (() => vo
 
   const finish = (): void => {
     bar.style.width = '100%';
+    const doneLabel = extraPractice ? '加练完成' : '今日学习完成';
     host.innerHTML = `
       <div class="p-8 text-center">
         <p class="text-3xl mb-4">✅</p>
-        <p>今日学习完成 (${total} 张)</p>
-        <button id="back" class="mt-6 rounded-2xl bg-gray-900 text-white px-6 py-3">回首页</button>
+        <p>${doneLabel} (${total} 张)</p>
+        <div class="mt-6 flex flex-col gap-3 items-center">
+          <button id="again" class="rounded-2xl bg-gray-900 text-white px-6 py-3">再来一组</button>
+          <button id="back" class="rounded-2xl bg-gray-100 text-gray-900 px-6 py-3">回首页</button>
+        </div>
       </div>`;
     host.querySelector('#back')!.addEventListener('click', () => navigate('#/home'));
+    host.querySelector('#again')!.addEventListener('click', () => {
+      void renderSession(root);
+    });
   };
 
   const commit = async (word: Word, grade: Grade): Promise<void> => {
