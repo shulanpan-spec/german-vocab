@@ -1,0 +1,109 @@
+[
+  { "id": "L8-elternzeit", "german": "Elternzeit", "article": "die", "pos": "noun", "chinese": ["育儿假"], "german_synonyms": [], "lektion": 8, "page": "S.254", "source": "Im Berufssprachkurs B2" },
+  { "id": "L8-elternzeitvertretung", "german": "Elternzeitvertretung", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["育儿假替补"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-erzieher", "german": "Erzieher", "article": "der", "plural": "-", "pos": "noun", "chinese": ["教育工作者"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-frauenberuf", "german": "Frauenberuf", "article": "der", "plural": "-e", "pos": "noun", "chinese": ["女性职业"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-kindertagesstaette", "german": "Kindertagesstätte", "article": "die", "plural": "-n", "pos": "noun", "chinese": ["幼儿园"], "german_synonyms": ["Kita"], "lektion": 8, "page": "S.254" },
+  { "id": "L8-krippe", "german": "Krippe", "article": "die", "plural": "-n", "pos": "noun", "chinese": ["托儿所"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-leitung", "german": "Leitung", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["领导", "管理"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-migration", "german": "Migration", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["迁移", "移民"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-migrationshintergrund", "german": "Migrationshintergrund", "article": "der", "plural": "Migrationshintergründe", "pos": "noun", "chinese": ["移民背景"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-uebernahme", "german": "Übernahme", "article": "die", "plural": "-n", "pos": "noun", "chinese": ["接管", "接收"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-umgang", "german": "Umgang", "article": "der", "pos": "noun", "chinese": ["接触", "交往"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-verhaeltnis", "german": "Verhältnis", "article": "das", "plural": "-se", "pos": "noun", "chinese": ["关系", "比例"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-vertretung", "german": "Vertretung", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["替代", "代理"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-vertretungskraft", "german": "Vertretungskraft", "article": "die", "plural": "Vertretungskräfte", "pos": "noun", "chinese": ["替补人员"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-vertretungsstelle", "german": "Vertretungsstelle", "article": "die", "plural": "-n", "pos": "noun", "chinese": ["替补职位"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-anerkennen", "german": "anerkennen", "pos": "verb", "chinese": ["承认", "认可"], "german_synonyms": [], "lektion": 8, "page": "S.254", "irregular": true },
+  { "id": "L8-ausueben", "german": "ausüben", "pos": "verb", "chinese": ["从事", "履行"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-senden", "german": "senden", "pos": "verb", "chinese": ["发送"], "german_synonyms": ["schicken"], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-anerkannt", "german": "anerkannt", "pos": "adj", "chinese": ["公认的"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-interkulturell", "german": "interkulturell", "pos": "adj", "chinese": ["跨文化的", "多元文化的"], "german_synonyms": ["multikulturell"], "lektion": 8, "page": "S.254" },
+  { "id": "L8-staatlich", "german": "staatlich", "pos": "adj", "chinese": ["国家的", "公立的"], "german_synonyms": ["öffentlich"], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-gastronomie", "german": "Gastronomie", "article": "die", "pos": "noun", "chinese": ["餐饮业"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-lkw-fahrer", "german": "Lkw-Fahrer", "article": "der", "plural": "-", "pos": "noun", "chinese": ["卡车司机"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-freier-mitarbeiter", "german": "freier Mitarbeiter", "pos": "noun", "chinese": ["自由职业者"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-minijob", "german": "Minijob", "article": "der", "plural": "-s", "pos": "noun", "chinese": ["微型工作"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-minijobber", "german": "Minijobber", "article": "der", "plural": "-", "pos": "noun", "chinese": ["微型工作者"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-zeitarbeit", "german": "Zeitarbeit", "article": "die", "pos": "noun", "chinese": ["临时工作"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-zeitarbeitsfirma", "german": "Zeitarbeitsfirma", "article": "die", "plural": "Zeitarbeitsfirmen", "pos": "noun", "chinese": ["临时工公司"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-teilzeitmodell", "german": "Teilzeitmodell", "article": "das", "plural": "-e", "pos": "noun", "chinese": ["兼职模式"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-dazuverdienen", "german": "dazuverdienen", "pos": "verb", "chinese": ["兼职增收"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-vertiefen", "german": "vertiefen", "pos": "verb", "chinese": ["加深"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-geringfuegig", "german": "geringfügig", "pos": "adj", "chinese": ["微小的"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-unfallversichert", "german": "unfallversichert", "pos": "adj", "chinese": ["有工伤保险的"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-recht-ziemlich", "german": "recht", "pos": "adv", "chinese": ["相当", "颇为"], "german_synonyms": ["ziemlich"], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-folge", "german": "Folge", "article": "die", "plural": "-n", "pos": "noun", "chinese": ["后果", "结果"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-schilderung", "german": "Schilderung", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["描述"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-widerspruch", "german": "Widerspruch", "article": "der", "plural": "Widersprüche", "pos": "noun", "chinese": ["矛盾", "异议"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-ausdruecken", "german": "ausdrücken", "pos": "verb", "chinese": ["表达"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-sich-benehmen", "german": "sich benehmen", "pos": "verb", "chinese": ["举止", "表现"], "german_synonyms": [], "lektion": 8, "page": "S.254", "irregular": true },
+  { "id": "L8-hinstellen", "german": "hinstellen", "pos": "verb", "chinese": ["放置", "立起"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-kritisieren", "german": "kritisieren", "pos": "verb", "chinese": ["批评"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-ueberzeugen", "german": "überzeugen", "pos": "verb", "chinese": ["说服"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-vermissen", "german": "vermissen", "pos": "verb", "chinese": ["想念"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-verzichten", "german": "verzichten auf", "pos": "verb", "chinese": ["放弃"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-vertragen", "german": "vertragen", "pos": "verb", "chinese": ["容忍", "忍受"], "german_synonyms": [], "lektion": 8, "page": "S.254", "irregular": true },
+
+  { "id": "L8-selbstverstaendlich", "german": "selbstverständlich", "pos": "adj", "chinese": ["不言而喻的"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-eben", "german": "eben", "pos": "adv", "chinese": ["正好", "刚才"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-ein-wenig", "german": "ein wenig", "pos": "phrase", "chinese": ["一点儿"], "german_synonyms": ["etwas"], "lektion": 8, "page": "S.254" },
+  { "id": "L8-statt", "german": "statt", "pos": "phrase", "chinese": ["代替"], "german_synonyms": ["anstatt"], "lektion": 8, "page": "S.254" },
+  { "id": "L8-ueberhaupt", "german": "überhaupt", "pos": "adv", "chinese": ["究竟", "到底"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+  { "id": "L8-zwar-aber", "german": "zwar ... aber", "pos": "phrase", "chinese": ["虽然……但是"], "german_synonyms": [], "lektion": 8, "page": "S.254" },
+
+  { "id": "L8-aenderung", "german": "Änderung", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["改变", "修改"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-anschaffung", "german": "Anschaffung", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["购置"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-gruppenraum", "german": "Gruppenraum", "article": "der", "plural": "Gruppenräume", "pos": "noun", "chinese": ["团体活动室"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-konsequenz", "german": "Konsequenz", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["后果"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-schicht", "german": "Schicht", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["班次"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-schichtwechsel", "german": "Schichtwechsel", "article": "der", "plural": "-", "pos": "noun", "chinese": ["换班"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-verhalten", "german": "Verhalten", "article": "das", "pos": "noun", "chinese": ["行为", "态度"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-verschiebung", "german": "Verschiebung", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["推迟"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-wochenplan", "german": "Wochenplan", "article": "der", "plural": "Wochenpläne", "pos": "noun", "chinese": ["周计划"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-zeitplan", "german": "Zeitplan", "article": "der", "plural": "Zeitpläne", "pos": "noun", "chinese": ["时间表"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+
+  { "id": "L8-sich-absprechen", "german": "sich absprechen mit", "pos": "verb", "chinese": ["协商"], "german_synonyms": [], "lektion": 8, "page": "S.255", "irregular": true },
+  { "id": "L8-ansprechen", "german": "ansprechen", "pos": "verb", "chinese": ["谈及", "搭话"], "german_synonyms": [], "lektion": 8, "page": "S.255", "irregular": true },
+  { "id": "L8-sich-auswirken", "german": "sich auswirken auf", "pos": "verb", "chinese": ["影响"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-dranhaengen", "german": "dranhängen", "pos": "verb", "chinese": ["附加", "挂上"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-eintragen", "german": "eintragen in", "pos": "verb", "chinese": ["填入", "登记"], "german_synonyms": [], "lektion": 8, "page": "S.255", "irregular": true },
+  { "id": "L8-sich-entschuldigen", "german": "sich entschuldigen für", "pos": "verb", "chinese": ["道歉"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-erledigen", "german": "erledigen", "pos": "verb", "chinese": ["完成", "办理"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-gehoeren-zu", "german": "gehören zu", "pos": "verb", "chinese": ["属于"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-kaputtgehen", "german": "kaputtgehen", "pos": "verb", "chinese": ["损坏"], "german_synonyms": [], "lektion": 8, "page": "S.255", "irregular": true },
+  { "id": "L8-klaeren", "german": "klären mit", "pos": "verb", "chinese": ["澄清", "弄清楚"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-warnen", "german": "warnen vor", "pos": "verb", "chinese": ["警告"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-zusagen", "german": "zusagen", "pos": "verb", "chinese": ["答应"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+
+  { "id": "L8-peinlich", "german": "peinlich", "pos": "adj", "chinese": ["尴尬的"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-perfekt", "german": "perfekt", "pos": "adj", "chinese": ["完美的"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-sinnvoll", "german": "sinnvoll", "pos": "adj", "chinese": ["合理的", "有意义的"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-souveraen", "german": "souverän", "pos": "adj", "chinese": ["自信的", "从容的"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-voellig", "german": "völlig", "pos": "adj", "chinese": ["完全的"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+
+  { "id": "L8-stattdessen", "german": "stattdessen", "pos": "adv", "chinese": ["取而代之"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+
+  { "id": "L8-anbieter", "german": "Anbieter", "article": "der", "plural": "-", "pos": "noun", "chinese": ["提供者", "供应商"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-anmeldeformular", "german": "Anmeldeformular", "article": "das", "plural": "-e", "pos": "noun", "chinese": ["报名表"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-fortbildungskurs", "german": "Fortbildungskurs", "article": "der", "plural": "-e", "pos": "noun", "chinese": ["进修课程"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-fortbildungsveranstaltung", "german": "Fortbildungsveranstaltung", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["进修活动"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-schulungszentrum", "german": "Schulungszentrum", "article": "das", "plural": "Schulungszentren", "pos": "noun", "chinese": ["培训中心"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-zentrum", "german": "Zentrum", "article": "das", "plural": "Zentren", "pos": "noun", "chinese": ["中心"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+
+  { "id": "L8-verschieben", "german": "verschieben auf", "pos": "verb", "chinese": ["推迟到"], "german_synonyms": [], "lektion": 8, "page": "S.255", "irregular": true },
+
+  { "id": "L8-aehnlich", "german": "ähnlich", "pos": "adj", "chinese": ["相似的"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+
+  { "id": "L8-anbei", "german": "anbei", "pos": "adv", "chinese": ["附上"], "german_synonyms": [], "lektion": 8, "page": "S.255" },
+  { "id": "L8-direkt-nach", "german": "direkt nach", "pos": "phrase", "chinese": ["紧接着"], "german_synonyms": [], "lektion": 8, "page": "S.255" }
+]

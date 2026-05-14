@@ -5,6 +5,9 @@ import lektion04 from '../vocab/lektion-04.json';
 import lektion05 from '../vocab/lektion-05.json';
 import lektion06 from '../vocab/lektion-06.json';
 import lektion07 from '../vocab/lektion-07.json';
+import lektion08 from '../vocab/lektion-08.json';
+import lektion09 from '../vocab/lektion-09.json';
+import lektion10 from '../vocab/lektion-10.json';
 import { db } from './db';
 import type { Word } from './types';
 
@@ -37,6 +40,9 @@ export async function seedAll(now = Date.now()): Promise<number> {
     ...(lektion05 as SeedWord[]),
     ...(lektion06 as SeedWord[]),
     ...(lektion07 as SeedWord[]),
+    ...(lektion08 as SeedWord[]),
+    ...(lektion09 as SeedWord[]),
+    ...(lektion10 as SeedWord[]),
   ];
   return seedFromArray(all, now);
 }
