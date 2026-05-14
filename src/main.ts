@@ -7,6 +7,17 @@ import { warmUpTTS } from './tts';
 import { cleanupLegacyKeys } from './lib/llm';
 
 async function boot(): Promise<void> {
+  // When a new SW takes control (after autoUpdate's skipWaiting), reload once
+  // so the user gets the fresh bundle without needing a manual second refresh.
+  if ('serviceWorker' in navigator) {
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+  }
+
   cleanupLegacyKeys();
   await db.open();
   await seedAll();

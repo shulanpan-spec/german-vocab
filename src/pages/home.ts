@@ -13,20 +13,21 @@ export function renderHome(root: HTMLElement): void | (() => void) {
         <div class="grid grid-cols-3 gap-3">
           <div class="rounded-2xl bg-gray-100 p-4 text-center">
             <div class="text-3xl font-semibold" id="due">–</div>
-            <div class="text-xs text-gray-500 mt-1">待复习</div>
+            <div class="text-xs text-gray-500 mt-1">今日待复习</div>
           </div>
           <div class="rounded-2xl bg-gray-100 p-4 text-center">
             <div class="text-3xl font-semibold" id="newcount">–</div>
-            <div class="text-xs text-gray-500 mt-1">新词</div>
+            <div class="text-xs text-gray-500 mt-1">未学新词</div>
           </div>
           <div class="rounded-2xl bg-gray-100 p-4 text-center">
             <div class="text-3xl font-semibold" id="streak">–</div>
-            <div class="text-xs text-gray-500 mt-1">连续</div>
+            <div class="text-xs text-gray-500 mt-1">连续天数</div>
           </div>
         </div>
         <button id="start" class="mt-4 rounded-2xl bg-gray-900 text-white py-5 text-lg font-medium">
           开始今日学习
         </button>
+        <p class="text-xs text-gray-400 text-center -mt-2" id="hint"></p>
         <nav class="mt-auto py-4 flex justify-around text-sm text-gray-600">
           <a href="#/library">📚 词库</a>
           <a href="#/settings">⚙️ 设置</a>
@@ -49,7 +50,23 @@ export function renderHome(root: HTMLElement): void | (() => void) {
     root.querySelector('#due')!.textContent = String(reviewDue);
     root.querySelector('#newcount')!.textContent = String(newCount);
     root.querySelector('#streak')!.textContent = String(streak);
-    root.querySelector('#subtitle')!.textContent = `${dueAll.length} 张卡待学`;
+
+    const subtitle = root.querySelector('#subtitle')!;
+    const hint = root.querySelector('#hint')!;
+    const startBtn = root.querySelector('#start') as HTMLButtonElement;
+    if (dueAll.length > 0) {
+      subtitle.textContent = `${dueAll.length} 张卡待学`;
+      hint.textContent = '';
+    } else if (allIds.length > 0) {
+      subtitle.textContent = `今日已完成 · 词库 ${allIds.length} 词`;
+      startBtn.textContent = '开始加练';
+      hint.textContent = '今日待复习已清空，加练即将到期的单词';
+    } else {
+      subtitle.textContent = '词库还是空的';
+      startBtn.disabled = true;
+      startBtn.classList.add('opacity-50');
+      hint.textContent = '去词库添加单词';
+    }
   })();
 
   const onClick = () => navigate('#/session');
