@@ -1,3 +1,4 @@
+import lektion01 from '../vocab/lektion-01.json';
 import lektion02 from '../vocab/lektion-02.json';
 import lektion07 from '../vocab/lektion-07.json';
 import { db } from './db';
@@ -25,6 +26,7 @@ export async function seedAll(now = Date.now()): Promise<number> {
   // Add new Lektion files here; seedFromArray is idempotent on id, so existing
   // users get only the new entries on next load.
   const all: SeedWord[] = [
+    ...(lektion01 as SeedWord[]),
     ...(lektion02 as SeedWord[]),
     ...(lektion07 as SeedWord[]),
   ];
