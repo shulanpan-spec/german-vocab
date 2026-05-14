@@ -1,0 +1,80 @@
+[
+  { "id": "L13-aenderungswunsch", "german": "Änderungswunsch", "article": "der", "plural": "Änderungswünsche", "pos": "noun", "chinese": ["改动愿望"], "german_synonyms": [], "lektion": 13, "page": "S.324", "source": "Im Berufssprachkurs B2" },
+  { "id": "L13-bestellzettel", "german": "Bestellzettel", "article": "der", "plural": "-", "pos": "noun", "chinese": ["订单"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-kommunikation", "german": "Kommunikation", "article": "die", "pos": "noun", "chinese": ["沟通", "交流"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-konflikt", "german": "Konflikt", "article": "der", "plural": "-e", "pos": "noun", "chinese": ["冲突"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-missverstaendnis", "german": "Missverständnis", "article": "das", "plural": "-se", "pos": "noun", "chinese": ["误解"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-speisekarte", "german": "Speisekarte", "article": "die", "plural": "-n", "pos": "noun", "chinese": ["菜单"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-streitigkeit", "german": "Streitigkeit", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["争执"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+
+  { "id": "L13-bruellen", "german": "brüllen", "pos": "verb", "chinese": ["吼叫"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-nicht-nachkommen", "german": "nicht nachkommen", "pos": "phrase", "chinese": ["应付不来"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-nicken", "german": "nicken", "pos": "verb", "chinese": ["点头"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-platzt-der-kragen", "german": "jemandem platzt der Kragen", "pos": "phrase", "chinese": ["失去耐心", "忍无可忍"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-sich-wehren", "german": "sich wehren", "pos": "verb", "chinese": ["反抗", "抵御"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-mit-halbem-ohr-zuhoeren", "german": "mit halbem Ohr zuhören", "pos": "phrase", "chinese": ["漫不经心地听"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-zurufen", "german": "zurufen", "pos": "verb", "chinese": ["大声呼喊"], "german_synonyms": [], "lektion": 13, "page": "S.324", "irregular": true },
+
+  { "id": "L13-empoert", "german": "empört", "pos": "adj", "chinese": ["愤怒的", "气愤的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-ewig", "german": "ewig", "pos": "adj", "chinese": ["永恒的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+
+  { "id": "L13-das-mass-ist-voll", "german": "das Maß ist voll", "pos": "phrase", "chinese": ["忍无可忍"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-in-letzter-zeit", "german": "in letzter Zeit", "pos": "phrase", "chinese": ["最近"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-vor-kurzem", "german": "vor Kurzem", "pos": "phrase", "chinese": ["不久前"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+
+  { "id": "L13-frechheit", "german": "Frechheit", "article": "die", "plural": "-en", "pos": "noun", "chinese": ["无礼"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-grund", "german": "Grund", "article": "der", "plural": "Gründe", "pos": "noun", "chinese": ["原因"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-konfliktstrategie", "german": "Konfliktstrategie", "article": "die", "plural": "-n", "pos": "noun", "chinese": ["冲突策略"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-ton", "german": "Ton", "article": "der", "pos": "noun", "chinese": ["语气", "声音"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+
+  { "id": "L13-abwarten", "german": "abwarten", "pos": "verb", "chinese": ["等待"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-bewerten", "german": "bewerten", "pos": "verb", "chinese": ["评价"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-sich-hoeren-lassen", "german": "sich hören lassen", "pos": "phrase", "chinese": ["让自己被听到", "出声"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-drohen", "german": "drohen", "pos": "verb", "chinese": ["威胁"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-sich-einbilden", "german": "sich einbilden", "pos": "verb", "chinese": ["妄想", "幻想"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-sich-einigen", "german": "sich einigen auf", "pos": "verb", "chinese": ["一致同意"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-herumbruellen", "german": "herumbrüllen", "pos": "verb", "chinese": ["到处大叫"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-es-reicht", "german": "es reicht", "pos": "phrase", "chinese": ["够了"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-unter-vier-augen-sprechen", "german": "unter vier Augen sprechen", "pos": "phrase", "chinese": ["私下谈话"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-unterstellen", "german": "unterstellen", "pos": "verb", "chinese": ["暗指", "暗示"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-verschlafen", "german": "verschlafen", "pos": "verb", "chinese": ["睡过头"], "german_synonyms": [], "lektion": 13, "page": "S.324", "irregular": true },
+
+  { "id": "L13-aggressiv", "german": "aggressiv", "pos": "adj", "chinese": ["攻击性的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-aufgebracht", "german": "aufgebracht", "pos": "adj", "chinese": ["愤怒的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-ausgemacht", "german": "ausgemacht", "pos": "adj", "chinese": ["商定的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-einfuehlsam", "german": "einfühlsam", "pos": "adj", "chinese": ["有同情心的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-feindselig", "german": "feindselig", "pos": "adj", "chinese": ["敌对的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-gereizt", "german": "gereizt", "pos": "adj", "chinese": ["烦躁的", "易怒的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-klaerend", "german": "klärend", "pos": "adj", "chinese": ["澄清的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-kollegial", "german": "kollegial", "pos": "adj", "chinese": ["同事友好的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-stoerend", "german": "störend", "pos": "adj", "chinese": ["干扰的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-ueberlegt", "german": "überlegt", "pos": "adj", "chinese": ["经过考虑的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-wohlwollend", "german": "wohlwollend", "pos": "adj", "chinese": ["善意的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+
+  { "id": "L13-von-sich-aus", "german": "von sich aus", "pos": "phrase", "chinese": ["主动地"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+
+  { "id": "L13-uebergabe", "german": "Übergabe", "article": "die", "pos": "noun", "chinese": ["交接"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-uebergabeprotokoll", "german": "Übergabeprotokoll", "article": "das", "plural": "-e", "pos": "noun", "chinese": ["交接记录"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+
+  { "id": "L13-absetzen", "german": "absetzen", "pos": "verb", "chinese": ["卸下", "罢免"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-bescheid-geben", "german": "Bescheid geben", "pos": "phrase", "chinese": ["告知", "通知"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-am-platz-sein", "german": "am Platz sein", "pos": "phrase", "chinese": ["在场"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-ueberlesen", "german": "überlesen", "pos": "verb", "chinese": ["漏看", "略读"], "german_synonyms": [], "lektion": 13, "page": "S.324", "irregular": true },
+  { "id": "L13-vertragen-zw", "german": "vertragen", "pos": "verb", "chinese": ["忍受", "相处"], "german_synonyms": [], "lektion": 13, "page": "S.324", "irregular": true },
+
+  { "id": "L13-hektisch", "german": "hektisch", "pos": "adj", "chinese": ["忙乱的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+  { "id": "L13-schrecklich", "german": "schrecklich", "pos": "adj", "chinese": ["可怕的"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+
+  { "id": "L13-vielmals", "german": "vielmals", "pos": "adv", "chinese": ["多次", "非常"], "german_synonyms": [], "lektion": 13, "page": "S.324" },
+
+  { "id": "L13-besprechungsraum", "german": "Besprechungsraum", "article": "der", "plural": "Besprechungsräume", "pos": "noun", "chinese": ["会议室"], "german_synonyms": [], "lektion": 13, "page": "S.325" },
+  { "id": "L13-im-prinzip", "german": "im Prinzip", "pos": "phrase", "chinese": ["原则上"], "german_synonyms": [], "lektion": 13, "page": "S.325" },
+
+  { "id": "L13-verteilen", "german": "verteilen", "pos": "verb", "chinese": ["分配", "分发"], "german_synonyms": [], "lektion": 13, "page": "S.325" },
+
+  { "id": "L13-direkt", "german": "direkt", "pos": "adj", "chinese": ["直接的"], "german_synonyms": [], "lektion": 13, "page": "S.325" },
+  { "id": "L13-fordernd", "german": "fordernd", "pos": "adj", "chinese": ["要求的"], "german_synonyms": [], "lektion": 13, "page": "S.325" },
+  { "id": "L13-unverbluemt", "german": "unverblümt", "pos": "adj", "chinese": ["直率的", "毫不掩饰的"], "german_synonyms": [], "lektion": 13, "page": "S.325" },
+
+  { "id": "L13-ausgerechnet", "german": "ausgerechnet", "pos": "adv", "chinese": ["偏偏"], "german_synonyms": [], "lektion": 13, "page": "S.325" }
+]
